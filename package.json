@@ -1,0 +1,14 @@
+{
+  "name": "packagetracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "commitizen": "^2.9.6",
+    "cz-conventional-changelog": "^2.0.0",
+    "express": "^4.16.2",
+    "mongodb": "^2.2.33"
+  },
+  "author": "",
+  "license": "UNLICENSED"
+}
