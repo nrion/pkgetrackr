@@ -14,6 +14,7 @@ window.onload = () => {
   const customerRegistrationView = document.getElementById('customerRegistrationView');
   const packageRegistrationView = document.getElementById('packageRegistrationView');
   const allCustomersView = document.getElementById('allCustomersView');
+  const customerSearchView = document.getElementById('customerSearchView');
 
   function setContentView(view) {
       bodyContent.innerHTML = view.innerHTML;
@@ -25,9 +26,10 @@ window.onload = () => {
       setContentView(view);
     }
   }
-
-  setContentView(adminLoginView);
+ 
+  setContentView(homeView);
   prepairLinkForSwitchingView(customerRegistrationViewLink, customerRegistrationView);
+  prepairLinkForSwitchingView(customerSearchViewLink, customerSearchView);
   prepairLinkForSwitchingView(homeViewLink, homeView);
 
   doAjax(`/getPackages/59e649e8110f0b163a701e8d`, (packages) => {
@@ -62,4 +64,5 @@ window.onload = () => {
       }
     })
   }
+
 }
