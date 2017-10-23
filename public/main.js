@@ -51,12 +51,12 @@ window.onload = () => {
 
       for (const customer of customers) {
         customersContainer.innerHTML += `
-          <div><i class="fa fa-user-o" aria-hidden="true"></i> ${customer.name}</div>
-          <span style="text-indent :1.5em;">
-            <i class="fa fa-envelope-o" aria-hidden="true"></i> ${customer.email}
-            <i class="fa fa-mobile" aria-hidden="true"></i> ${customer.mobileNumber}
-            <i class="fa fa-address-book-o" aria-hidden="true"></i> ${customer.address}
-          </span>
+          <div><h5><i class="fa fa-user-o" aria-hidden="true"></i> <strong>${customer.name}</strong></h5></div>
+          <div class="row">
+            <div class="col-lg-3"><i class="fa fa-envelope-o" aria-hidden="true"></i> ${customer.email}</div>
+            <div class="col-md-2"><i class="fa fa-mobile" aria-hidden="true"></i> ${customer.mobileNumber}</div>
+            <div class="col-md-auto"><i class="fa fa-address-book-o" aria-hidden="true"></i> ${customer.address}</div>
+          </div>
           <hr>
         `;
       }
