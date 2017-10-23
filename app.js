@@ -34,6 +34,39 @@ MongoClient.connect(url, (error, db) => {
         }
       })
     });
+
+    app.post('/createPackage', (request, response) => {
+      db.collection('packages').insertOne({ 
+        customerId: '59e649e8110f0b163a701e8d',
+        origin: request.body.origin, 
+        destination: request.body.destination, 
+        routes: request.body.routes, 
+        currentLocation: request.body.currentLocation, 
+        status: request.body.status,
+        paymode: request.body.paymode,
+        boxSize: request.body.boxSize, 
+        price: request.body.price,
+        transactionDate: new Date()
+      }, (insertErr, result) => {
+        if (insertErr) { console.log('package cannot be inserted!', error) }
+        else {
+          // response.writeHead(302, { 'Location': '/' });
+          response.end(); 
+        }
+      })
+    });
+
+    app.get('/getPackages/:customerId', (request, response) => {
+      db.collection('packages').find({
+        customerId: request.params.customerId
+      }).toArray((readErr, packages) => {
+        if (readErr) { console.log('package cannot be read!', error) }
+        else {
+          // response.writeHead(302, { 'Location': '/' });
+          response.json(packages)
+        }
+      })
+    })
     
     app.listen(port, () => { console.log(`Server @ http://localhost:${port}`) }); 
   }
