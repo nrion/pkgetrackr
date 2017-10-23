@@ -38,4 +38,26 @@ window.onload = () => {
       `
     } 
   });
+
+  document.getElementById('allCustomersViewLink').onclick = (event) => {
+    event.preventDefault();
+    setContentView(allCustomersView);
+
+    doAjax(`/getCustomers`, (customers) => {
+      const customersContainer = document.getElementById('customersContainer');
+      customersContainer.innerHTML = '';
+
+      for (const customer of customers) {
+        customersContainer.innerHTML += `
+          <div><i class="fa fa-user-o" aria-hidden="true"></i> ${customer.name}</div>
+          <span style="text-indent :1.5em;">
+            <i class="fa fa-envelope-o" aria-hidden="true"></i> ${customer.email}
+            <i class="fa fa-mobile" aria-hidden="true"></i> ${customer.mobileNumber}
+            <i class="fa fa-address-book-o" aria-hidden="true"></i> ${customer.address}
+          </span>
+          <hr>
+        `;
+      }
+    })
+  }
 }
