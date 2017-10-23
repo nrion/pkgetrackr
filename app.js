@@ -35,6 +35,15 @@ MongoClient.connect(url, (error, db) => {
       })
     });
 
+    app.get('/getCustomers', (request, response) => {
+      db.collection('customers').find().toArray((readErr, customers) => {
+        if (readErr) { console.log('error viewing all customers!', error) }
+        else {
+          response.json(customers)
+        }
+      })
+    })
+
     app.post('/createPackage', (request, response) => {
       db.collection('packages').insertOne({ 
         customerId: '59e649e8110f0b163a701e8d',
