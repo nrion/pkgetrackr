@@ -88,6 +88,80 @@
         </div>
       </main> 
     </template>
+
+     <template id="packageRegistrationView">
+      <main role="main" class="container">
+        <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
+          <strong>success!</strong> you have created a customer
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="row">
+          <div class="col-md-4 packageForm">
+            <h5><i class="fa fa-archive" aria-hidden="true"></i> add packages for *user*</h5>
+            <hr>
+            <form action="/createPackage" method="POST">
+              <div class="form-group">
+                <label for="originInput">origin</label>
+                <select id="originInput" class="form-control" name="origin">
+                  <option value="iloilo">Iloilo</option>
+                  <option value="capiz">Capiz</option>
+                  <option value="antique">Antique</option>
+                  <option value="guimaras">Guimaras</option>
+                  <option value="aklan">Aklan</option>
+                  <option value="negros occidental">Negros Occidental</option>
+                  <option value="negros oriental">Negros Orriental</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="destinationInput">destination</label>
+                <select id="destinationInput" class="form-control" name="destination">
+                  <option value="iloilo">Iloilo</option>
+                  <option value="capiz">Capiz</option>
+                  <option value="antique">Antique</option>
+                  <option value="guimaras">Guimaras</option>
+                  <option value="aklan">Aklan</option>
+                  <option value="negros occidental">Negros Occidental</option>
+                  <option value="negros oriental">Negros Orriental</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="routesInput">routes</label>
+                <input type="text" class="form-control" id="routesInput" name="routes" placeholder="enumerate them routes">
+              </div>
+              <div class="form-group">
+                <label for="currentLocationInput">current location</label>
+                <input type="text" class="form-control" id="currentLocationInput" name="currentLocation" placeholder="where is it right now?">
+              </div>
+              <div class="form-group">
+                <label for="statusInput">status</label>
+                <select id="statusInput" class="form-control" name="status">
+                  <option value="pending">pending</option>
+                  <option value="moving">moving</option>
+                  <option value="arrived">arrived</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="paymodeInput">paymode</label>
+                <select id="paymodeInput" class="form-control" name="paymode">
+                  <option value="prepaid">prepaid</option>
+                  <option value="frieghtCollect">freight collect</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-outline-dark">add</button>
+            </form>
+          </div>
+          <div class="col-md-5 packageForm">
+            <h5>packages</h5>
+            <div id="addedPackagesContainer">
+              <!-- do ajax here -->
+            </div>
+            <button type="submit" class="btn btn-dark mt-3">next <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+            </button>
+          </div>
+      </main> 
+    </template>
     
      <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> 
      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script> 
