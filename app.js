@@ -26,11 +26,10 @@ MongoClient.connect(url, (error, db) => {
         password: request.body.password, 
         mobileNumber: request.body.mobileNumber, 
         address: request.body.address,
-        transactionDate: new Date(request.body.Date)
       }, (insertErr, result) => {
         if (insertErr) { console.log('customer cannot be inserted!', error) }
         else {
-          response.writeHead(302, { 'Location': '/' });
+          // response.writeHead(302, { 'Location': '/' });
           response.end(); 
         }
       })
