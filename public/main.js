@@ -10,6 +10,7 @@ window.onload = () => {
 
   // templates
   const customerRegistrationView = document.getElementById('customerRegistrationView');
+  const homeView = document.getElementById('homeView');
 
   function setContentView(view) {
       bodyContent.innerHTML = view.innerHTML;
@@ -24,4 +25,5 @@ window.onload = () => {
 
   setContentView(customerRegistrationView);
   prepairLinkForSwitchingView(customerRegistrationViewLink, customerRegistrationView);
+  prepairLinkForSwitchingView(homeViewLink, homeView);
 }
