@@ -26,7 +26,7 @@ window.onload = () => {
     }
   }
 
-  setContentView(homeView);
+  setContentView(adminLoginView);
   prepairLinkForSwitchingView(customerRegistrationViewLink, customerRegistrationView);
   prepairLinkForSwitchingView(homeViewLink, homeView);
 
