@@ -9,9 +9,11 @@ window.onload = () => {
   const customerSearchViewLink = document.getElementById('customerSearchViewLink');
 
   // templates
+  const adminLoginView = document.getElementById('adminLoginView');
   const homeView = document.getElementById('homeView');
   const customerRegistrationView = document.getElementById('customerRegistrationView');
   const packageRegistrationView = document.getElementById('packageRegistrationView');
+  const allCustomersView = document.getElementById('allCustomersView');
 
   function setContentView(view) {
       bodyContent.innerHTML = view.innerHTML;
@@ -24,7 +26,7 @@ window.onload = () => {
     }
   }
 
-  setContentView(packageRegistrationView);
+  setContentView(homeView);
   prepairLinkForSwitchingView(customerRegistrationViewLink, customerRegistrationView);
   prepairLinkForSwitchingView(homeViewLink, homeView);
 
