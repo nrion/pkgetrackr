@@ -24,7 +24,18 @@ window.onload = () => {
     }
   }
 
-  setContentView(homeView);
+  setContentView(packageRegistrationView);
   prepairLinkForSwitchingView(customerRegistrationViewLink, customerRegistrationView);
   prepairLinkForSwitchingView(homeViewLink, homeView);
+
+  doAjax(`/getPackages/59e649e8110f0b163a701e8d`, (packages) => {
+    const addedPackagesContainer = document.getElementById('addedPackagesContainer');
+    addedPackagesContainer.innerHTML = '';
+
+    for (const package of packages) {
+      addedPackagesContainer.innerHTML += `
+        <div><i class="fa fa-archive" aria-hidden="true"></i> package id: ${package._id}</div>
+      `
+    } 
+  });
 }
