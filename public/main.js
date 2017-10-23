@@ -15,7 +15,7 @@ window.onload = () => {
   const packageRegistrationView = document.getElementById('packageRegistrationView');
   const allCustomersView = document.getElementById('allCustomersView');
   const customerSearchView = document.getElementById('customerSearchView');
-
+  
   function setContentView(view) {
       bodyContent.innerHTML = view.innerHTML;
   }
@@ -29,7 +29,6 @@ window.onload = () => {
  
   setContentView(homeView);
   prepairLinkForSwitchingView(customerRegistrationViewLink, customerRegistrationView);
-  prepairLinkForSwitchingView(customerSearchViewLink, customerSearchView);
   prepairLinkForSwitchingView(homeViewLink, homeView);
 
   doAjax(`/getPackages/59e649e8110f0b163a701e8d`, (packages) => {
@@ -42,6 +41,36 @@ window.onload = () => {
       `
     } 
   });
+
+  document.getElementById('customerSearchViewLink').onclick = (event) => {
+    event.preventDefault();
+    setContentView(customerSearchView);
+    
+    const findCustomerInput = document.getElementById('findCustomerInput');
+    
+    findCustomerInput.onkeyup = () => {
+      const url = '/findCustomer/' + encodeURIComponent(findCustomerInput.value); 
+
+      console.log(url)
+
+      doAjax(url, (customers) => {
+        const findCustomersContainer = document.getElementById('findCustomersContainer'); 
+        findCustomersContainer.innerHTML = '';
+
+        for (const customer of customers) {
+          findCustomersContainer.innerHTML += `
+            <div><h5><i class="fa fa-user-o" aria-hidden="true"></i> <strong>${customer.name}</strong></h5></div>
+            <div class="row">
+              <div class="col-lg-3"><i class="fa fa-envelope-o" aria-hidden="true"></i> ${customer.email}</div>
+              <div class="col-md-2"><i class="fa fa-mobile" aria-hidden="true"></i> ${customer.mobileNumber}</div>
+              <div class="col-md-auto"><i class="fa fa-address-book-o" aria-hidden="true"></i> ${customer.address}</div>
+            </div>
+            <hr>
+          `;
+        }
+      })
+    }
+  }
 
   document.getElementById('allCustomersViewLink').onclick = (event) => {
     event.preventDefault();
@@ -64,5 +93,4 @@ window.onload = () => {
       }
     })
   }
-
 }
