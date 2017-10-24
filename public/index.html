@@ -30,6 +30,9 @@
             <li class="nav-item">
               <a class="nav-link" href="#" id="customerSearchViewLink">customer search</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="packageTrackViewLink">package search</a>
+            </li>
           </ul>
           <ul class="nav navbar-nav">
             <li class="nav-item">
@@ -188,7 +191,7 @@
 
     <template id="allCustomersView">
       <main role="main" class="mt-4 container">
-        <h3>registered customers</h3>
+        <h5>registered customers</h5>
         <hr>
         <div id="customersContainer">
           <!-- do ajax here -->
@@ -208,7 +211,8 @@
     
     <template id="packageTrackView">
       <main role="main" class="mt-4 container">
-        <h3>find a package</h3>
+        <h5>find a <i class="fa fa-archive" aria-hidden="true"></i> package</h5>
+        <input class="form-control form-control-lg" type="text" id="findPackageInput" placeholder="packageid">
         <hr>
         <div id="packagesContainer">
           <!-- do ajax here -->

@@ -7,6 +7,7 @@ window.onload = () => {
   const packageRegistrationViewLink = document.getElementById('packageRegistrationViewLink');
   const allCustomersViewLink = document.getElementById('allCustomersViewLink');
   const customerSearchViewLink = document.getElementById('customerSearchViewLink');
+  const packageTrackViewLink = document.getElementById('packageTrackViewLink');
 
   // templates
   const adminLoginView = document.getElementById('adminLoginView');
@@ -15,7 +16,8 @@ window.onload = () => {
   const packageRegistrationView = document.getElementById('packageRegistrationView');
   const allCustomersView = document.getElementById('allCustomersView');
   const customerSearchView = document.getElementById('customerSearchView');
-  
+  const packageTrackView = document.getElementById('packageTrackView');
+
   function setContentView(view) {
       bodyContent.innerHTML = view.innerHTML;
   }
@@ -27,9 +29,10 @@ window.onload = () => {
     }
   }
  
-  setContentView(homeView);
+  setContentView(packageRegistrationView);
   prepairLinkForSwitchingView(customerRegistrationViewLink, customerRegistrationView);
   prepairLinkForSwitchingView(homeViewLink, homeView);
+  // prepairLinkForSwitchingView(packageTrackViewLink, packageTrackView);
 
   doAjax(`/getPackages/59e649e8110f0b163a701e8d`, (packages) => {
     const addedPackagesContainer = document.getElementById('addedPackagesContainer');
@@ -65,6 +68,38 @@ window.onload = () => {
               <div class="col-md-2"><i class="fa fa-mobile" aria-hidden="true"></i> ${customer.mobileNumber}</div>
               <div class="col-md-auto"><i class="fa fa-address-book-o" aria-hidden="true"></i> ${customer.address}</div>
             </div>
+            <hr>
+          `;
+        }
+      })
+    }
+  }
+  
+  document.getElementById('packageTrackViewLink').onclick = (event) => {
+    event.preventDefault();
+    setContentView(packageTrackView);
+    
+    const findPackageInput = document.getElementById('findPackageInput');
+    findPackageInput.onkeyup = () => {
+      const url = '/findPackage/' + encodeURIComponent(findPackageInput.value); 
+
+      doAjax(url, (packages) => {
+        const packagesContainer = document.getElementById('packagesContainer'); 
+        packagesContainer.innerHTML = '';
+
+        for (const package of packages) {
+          packagesContainer.innerHTML += `
+            <div><h5>package id: <i class="fa fa-archive" aria-hidden="true"></i> <strong>${package._id}</strong></h5></div>
+            <!-- owner desc here -->
+            <div><i class="fa fa-globe" aria-hidden="true"></i> ${package.origin}</div>
+            <div><i class="fa fa-plane" aria-hidden="true"></i> ${package.destination}</div>
+            <div><i class="fa fa-map-signs" aria-hidden="true"></i> ${package.routes}</div>
+            <div><i class="fa fa-map-marker" aria-hidden="true"></i> ${package.currentLocation}</div>
+            <div><i class="fa fa-spinner" aria-hidden="true"></i> ${package.status}</div>
+            <div><i class="fa fa-shopping-cart" aria-hidden="true"></i> ${package.paymode}</div>
+            <div><i class="fa fa-balance-scale aria-hidden="true"></i> ${package.size}</div>
+            <div><i class="fa fa-money" aria-hidden="true"></i> P ${package.price}</div>
+            <div><i class="fa fa-calendar" aria-hidden="true"></i>${package.transactionDate}</div>
             <hr>
           `;
         }

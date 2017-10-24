@@ -2,7 +2,7 @@ const express = require('express');
 const { MongoClient } = require('mongodb');
 const path = require('path');
 const bodyParser = require('body-parser');
-
+const ObjectId = require('mongodb').ObjectID; 
 
 const app = express(); 
 const port = 8084; 
@@ -52,14 +52,25 @@ MongoClient.connect(url, (error, db) => {
       db.collection('customers').find({ 
         name: { $regex: nameRegex } 
       }).toArray((readErr, customers) => {
-        if (readErr) { console.log('error viewing all customers!', error) }
+        if (readErr) { console.log('error finding a customer!', error) }
         else {
           response.json(customers)
         }
       })
     })
 
-    app.post('/createPackage', (request, response) => {
+    app.get('/findPackage/:packageId', (request, response) => {
+      db.collection('packages').find({ 
+        _id: ObjectId(request.params.packageId) 
+      }).toArray((readErr, customers) => {
+        if (readErr) { console.log('error finding a package!', error) }
+        else {
+          response.json(customers)
+        }
+      })
+    })
+
+    app.post('/createPackage/', (request, response) => {
       db.collection('packages').insertOne({ 
         customerId: '59e649e8110f0b163a701e8d',
         origin: request.body.origin, 
