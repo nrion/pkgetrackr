@@ -115,46 +115,34 @@
       </main> 
     </template>
 
-     <template id="packageRegistrationView">
+    
+
+    <template id="packageRegistrationView">
       <main role="main" class="container">
-        <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
-          <strong>success!</strong> you have created a customer
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
         <div class="row">
           <div class="col-md-4 packageForm">
             <h5><i class="fa fa-archive" aria-hidden="true"></i> add packages for *user*</h5>
             <hr>
-            <form action="/createPackage" method="POST">
+            <form action="/createPackage/59e649e8110f0b163a701e8d" method="POST">
               <div class="form-group">
                 <label for="originInput">origin</label>
                 <select id="originInput" class="form-control" name="origin">
-                  <option value="iloilo">Iloilo</option>
-                  <option value="capiz">Capiz</option>
-                  <option value="antique">Antique</option>
-                  <option value="guimaras">Guimaras</option>
-                  <option value="aklan">Aklan</option>
-                  <option value="negros occidental">Negros Occidental</option>
-                  <option value="negros oriental">Negros Orriental</option>
+                  <!-- doAjax here -->
                 </select>
               </div>
               <div class="form-group">
                 <label for="destinationInput">destination</label>
                 <select id="destinationInput" class="form-control" name="destination">
-                  <option value="iloilo">Iloilo</option>
-                  <option value="capiz">Capiz</option>
-                  <option value="antique">Antique</option>
-                  <option value="guimaras">Guimaras</option>
-                  <option value="aklan">Aklan</option>
-                  <option value="negros occidental">Negros Occidental</option>
-                  <option value="negros oriental">Negros Orriental</option>
+                  <!-- doAjax here -->
                 </select>
               </div>
+               <div id="areasToPassDiv" class="form-group">
+                <!-- <label for="areasToPassInput">routes</label>
+                <input type="text" class="form-control" id="routesInput" name="areasToPass" placeholder="enumerate them routes"> -->
+              </div> 
               <div class="form-group">
-                <label for="routesInput">routes</label>
-                <input type="text" class="form-control" id="routesInput" name="routes" placeholder="enumerate them routes">
+                <label for="distanceInKmInput">distance</label>
+                <input type="text" class="form-control" id="distanceInKmInput" name="distanceInKm" placeholder="how far is it? (in km)">
               </div>
               <div class="form-group">
                 <label for="currentLocationInput">current location</label>
@@ -172,7 +160,16 @@
                 <label for="paymodeInput">paymode</label>
                 <select id="paymodeInput" class="form-control" name="paymode">
                   <option value="prepaid">prepaid</option>
-                  <option value="frieghtCollect">freight collect</option>
+                  <option value="freight collect">freight collect</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="boxSizeInput">box size</label>
+                <select id="boxSizeInput" class="form-control" name="boxSize">
+                  <option value="extra small">extra small</option>
+                  <option value="small">small</option>
+                  <option value="medium">medium</option>
+                  <option value="large">large</option>
                 </select>
               </div>
               <button type="submit" class="btn btn-outline-dark">add</button>
@@ -214,7 +211,7 @@
         <h5>find a <i class="fa fa-archive" aria-hidden="true"></i> package</h5>
         <input class="form-control form-control-lg" type="text" id="findPackageInput" placeholder="packageid">
         <hr>
-        <div id="packagesContainer">
+        <div id="packageContainer">
           <!-- do ajax here -->
         </div>
       </main>
