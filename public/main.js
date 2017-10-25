@@ -92,11 +92,22 @@ window.onload = () => {
   });
 
   prepairLinkForSwitchingView(packagesViewLink, packagesView, () => {
-    getPackages()
-    
     // for creating packages - enumerating covered areas
+    const customerInput = document.getElementById('customerInput');
     const originInput = document.getElementById('originInput');
     const destinationInput = document.getElementById('destinationInput');
+
+    customerInput.oninput = () => {
+      getPackages()
+    }
+
+    doAjax('/getCustomers', (customers) => {
+      customerInput.innerHTML = '';
+
+      for (const customer of customers) {
+        customerInput.innerHTML += `<option value="${customer._id}">${customer.name}</option>`; 
+      }
+    }, 'GET')
 
     doAjax('/getCoveredAreas', (areas) => {
       originInput.innerHTML = '';
@@ -141,6 +152,7 @@ window.onload = () => {
 
     // inserting a package into the db
     document.getElementById('addPackageButton').onclick = () => {
+      const customerId = customerInput.value; 
       const origin = originInput.value; 
       const destination = destinationInput.value; 
       const distanceInKm = document.getElementById('distanceInKmInput').value;
@@ -157,24 +169,22 @@ window.onload = () => {
         }
       }
 
-      const zomeURL = `/createPackage/${encodeURIComponent('59e649e8110f0b163a701e8d')}/${encodeURIComponent(origin)}/${encodeURIComponent(destination)}/${encodeURIComponent(areasToPassArray)}/${encodeURIComponent(distanceInKm)}/${encodeURIComponent(currentLocation)}/${encodeURIComponent(status)}/${encodeURIComponent(paymode)}/${encodeURIComponent(boxSize)}`;
+      const zomeURL = `/createPackage/${encodeURIComponent(customerId)}/${encodeURIComponent(origin)}/${encodeURIComponent(destination)}/${encodeURIComponent(areasToPassArray)}/${encodeURIComponent(distanceInKm)}/${encodeURIComponent(currentLocation)}/${encodeURIComponent(status)}/${encodeURIComponent(paymode)}/${encodeURIComponent(boxSize)}`;
       doAjax(zomeURL, (result) => { alert(`attempted to add`) }, 'POST');
-
-      getPackages()
     }
 
     // for package registration form - enumerating packages
     function getPackages() {
-      doAjax(`/getPackages/${encodeURIComponent('59e649e8110f0b163a701e8d')}`, (packages) => {
-        const addedPackagesContainer = document.getElementById('addedPackagesContainer');
-        addedPackagesContainer.innerHTML = '';
+        doAjax(`/getPackages/${encodeURIComponent(customerInput.value)}`, (packages) => {
+          const addedPackagesContainer = document.getElementById('addedPackagesContainer');
+          addedPackagesContainer.innerHTML = '';
 
-        for (const package of packages) {
-          addedPackagesContainer.innerHTML += `
-            <div><i class="fa fa-archive" aria-hidden="true"></i> package id: ${package._id}</div>
-          `
-        } 
-      }, 'GET');
+          for (const package of packages) {
+            addedPackagesContainer.innerHTML += `
+              <div><i class="fa fa-archive" aria-hidden="true"></i> package id: ${package._id}</div>
+            `
+          } 
+        }, 'GET');
     }
  
     // for finding packages

@@ -162,8 +162,14 @@
             <main role="main" class="container">
               <div class="row">
                 <div class="col-md-4 packageForm">
-                  <h5><i class="fa fa-archive" aria-hidden="true"></i> add packages for *user*</h5>
+                  <h5><i class="fa fa-archive" aria-hidden="true"></i> add packages for a *customer*</h5>
                   <hr>
+                  <div class="form-group">
+                    <label for="customerInput">select customer</label>
+                    <select id="customerInput" class="form-control" name="customer">
+                      <!-- doAjax here -->
+                    </select>
+                  </div>
                   <div class="form-group">
                     <label for="originInput">origin</label>
                     <select id="originInput" class="form-control" name="origin">
