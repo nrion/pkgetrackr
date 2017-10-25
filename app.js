@@ -8,7 +8,6 @@ const app = express();
 const port = 8084; 
 const url = `mongodb://localhost:27017/tracker`;
 
-
 app
   .use(bodyParser.urlencoded({ extended: true }))
   .use(bodyParser.json())

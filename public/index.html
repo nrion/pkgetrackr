@@ -117,7 +117,7 @@
                     <label for="addressInput">address</label>
                     <textarea rows="2" class="form-control" id="addressInput" name="address" placeholder="address"></textarea>
                   </div>
-                  <button type="submit" class="btn btn-outline-dark">register</button>
+                  <button type="submit" id="customerRegistrationId" class="btn btn-outline-dark">register</button>
                 </form>
               </div>
             </main> 
@@ -126,7 +126,7 @@
             <main role="main" class="mt-4 container">
               <h5>registered customers</h5>
               <hr>
-              <div id="customersContainer">
+              <div class="card-columns" id="customersContainer">
                 <!-- do ajax here -->
               </div>
             </main>
@@ -135,7 +135,7 @@
             <main role="main" class="mt-4 container">
               <input class="form-control form-control-lg" type="text" id="findCustomerInput" placeholder="customer name">
               <hr>
-              <div id="findCustomersContainer">
+              <div class="card-columns" id="findCustomersContainer">
                 <!-- do ajax here -->
               </div>
             </main>
@@ -223,8 +223,7 @@
                   <div id="addedPackagesContainer">
                     <!-- do ajax here -->
                   </div>
-                  <button type="submit" class="btn btn-dark mt-3">next <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
-                  </button>
+                  <!-- <button id="refreshPackagesBtn" class="btn btn-dark btn-sm mt-2"><i class="fa fa-refresh" aria-hidden="true"></i> refresh</button> -->
                 </div>
             </main> 
           </div>
