@@ -51,38 +51,45 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
-    app.post('/createPackage/:customerId', (request, response) => {
+    const createPackageUrl = '/createPackage/:customerId/:origin/:destination/:areasToPass' 
+      + '/:distanceInKm/:currentLocation/:status/:paymode/:boxSize';
+
+    app.post(createPackageUrl, (request, response) => {
+      const routes = request.params.areasToPass; 
+      const areasToPassArray = routes.split(',');
       const computedPrice = computePrice(
-        request.body.distanceInKm, request.body.boxSize);
+        request.params.distanceInKm, request.params.boxSize);
+
+      console.log(areasToPassArray)
 
       db.collection('packages').insertOne({ 
-        customerId: request.params.customerId,
-        origin: request.body.origin, 
-        destination: request.body.destination, 
-        areasToPass: request.body.routes, 
-        distanceInKm: request.body.distanceInKm,
-        currentLocation: request.body.currentLocation, 
-        status: request.body.status,
-        paymode: request.body.paymode,
-        boxSize: request.body.boxSize, 
+        customerId: ObjectId(request.params.customerId),
+        origin: request.params.origin, 
+        destination: request.params.destination, 
+        areasToPass: areasToPassArray, 
+        distanceInKm: request.params.distanceInKm,
+        currentLocation: request.params.currentLocation, 
+        status: request.params.status,
+        paymode: request.params.paymode,
+        boxSize: request.params.boxSize, 
         price: computedPrice,
         transactionDate: new Date()
       }, (insertErr, result) => {
         if (insertErr) { console.log('package cannot be inserted!', error) }
-        else { response.end(); }
+        else { response.json(result) }
       })
     });
 
     app.get('/getPackages/:customerId', (request, response) => {
       db.collection('packages').find({
-        customerId: request.params.customerId
+        customerId: ObjectId(request.params.customerId)
       }).toArray((readErr, packages) => {
         if (readErr) { console.log('package cannot be read!', error) }
         else { response.json(packages) }
       })
     })
 
-     app.get('/findPackage/:packageId', (request, response) => {
+    app.get('/findPackage/:packageId', (request, response) => {
       db.collection('packages').findOne({ 
         _id: ObjectId(request.params.packageId) 
       }, (readErr, package) => {

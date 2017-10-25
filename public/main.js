@@ -34,23 +34,34 @@ window.onload = () => {
   prepairLinkForSwitchingView(customersViewLink, customersView, () => {
     console.log('switched to customers view');
 
-    // getting all registered customers
-    doAjax(`/getCustomers`, (customers) => {
-      const customersContainer = document.getElementById('customersContainer');
-      customersContainer.innerHTML = '';
-
+    function loopCustomers(customers, container) {
       for (const customer of customers) {
-        customersContainer.innerHTML += `
-          <div><h5><i class="fa fa-user-o" aria-hidden="true"></i> <strong>${customer.name}</strong></h5></div>
+        container.innerHTML += `
+          <div class="row">
+            <div class="col-sm-8"><h5><i class="fa fa-user-o" aria-hidden="true"></i> <strong>${customer.name}</strong></h5></div>
+            <div class="col-md-auto ml-auto mb-1">
+              <button type="button" class="btn btn-light btn-sm">view packages</button>
+              <button type="button" class="btn btn-light btn-sm">edit</button>
+              <button type="button" class="btn btn-light btn-sm">delete</button>
+            </div>
+          </div>
           <div class="row">
             <div class="col-lg-3"><i class="fa fa-envelope-o" aria-hidden="true"></i> ${customer.email}</div>
-            <div class="col-md-2"><i class="fa fa-mobile" aria-hidden="true"></i> ${customer.mobileNumber}</div>
+            <div class="col-lg-2"><i class="fa fa-mobile" aria-hidden="true"></i> ${customer.mobileNumber}</div>
             <div class="col-md-auto"><i class="fa fa-address-book-o" aria-hidden="true"></i> ${customer.address}</div>
           </div>
           <hr>
         `;
       }
-    })
+    }
+
+    // getting all registered customers
+    doAjax(`/getCustomers`, (customers) => {
+      const customersContainer = document.getElementById('customersContainer');
+      customersContainer.innerHTML = '';
+
+      loopCustomers(customers, customersContainer); 
+    }, 'GET')
 
     // finding a certain customer
     findCustomerInput.onkeyup = () => {
@@ -60,18 +71,8 @@ window.onload = () => {
         const findCustomersContainer = document.getElementById('findCustomersContainer'); 
         findCustomersContainer.innerHTML = '';
 
-        for (const customer of customers) {
-          findCustomersContainer.innerHTML += `
-            <div><h5><i class="fa fa-user-o" aria-hidden="true"></i> <strong>${customer.name}</strong></h5></div>
-            <div class="row">
-              <div class="col-lg-3"><i class="fa fa-envelope-o" aria-hidden="true"></i> ${customer.email}</div>
-              <div class="col-md-2"><i class="fa fa-mobile" aria-hidden="true"></i> ${customer.mobileNumber}</div>
-              <div class="col-md-auto"><i class="fa fa-address-book-o" aria-hidden="true"></i> ${customer.address}</div>
-            </div>
-            <hr>
-          `;
-        }
-      })
+        loopCustomers(customers, findCustomersContainer)
+      }, 'GET')
     }
   });
 
@@ -79,7 +80,12 @@ window.onload = () => {
     // for package registration from
     const originInput = document.getElementById('originInput');
     const destinationInput = document.getElementById('destinationInput');
-    
+    const distanceInKmInput = document.getElementById('distanceInKmInput');
+    const currentLocationInput = document.getElementById('currentLocationInput');
+    const statusInput = document.getElementById('statusInput');
+    const paymodeInput = document.getElementById('paymodeInput');
+    const boxSizeInput = document.getElementById('boxSizeInput');
+
     doAjax('/getCoveredAreas', (areas) => {
       originInput.innerHTML = '';
       destinationInput.innerHTML = '';
@@ -90,9 +96,63 @@ window.onload = () => {
         originInput.innerHTML += optionTag; 
         destinationInput.innerHTML += optionTag; 
       }
-    })
+    }, 'GET')
 
-    doAjax(`/getPackages/59e649e8110f0b163a701e8d`, (packages) => {
+      // for routes
+      const areasToPassInputs = document.getElementById('areasToPassInputs');
+      const addAreaBtn = document.getElementById('addAreaBtn');
+      const removeAreaBtn = document.getElementById('removeAreaBtn');
+      
+      let areaAddedCount = 0; 
+
+      addAreaBtn.onclick = () => {
+        areaAddedCount++;
+
+        areasToPassInputs.innerHTML += `
+          <div class="input-group mt-1" id="areaInputGroup${areaAddedCount}">
+            <span class="input-group-addon" id="basic-addon3">${areaAddedCount}</span>
+            <input type="text" class="form-control" id="areaToPassInput${areaAddedCount}" name="areaToPass" placeholder="where should it pass?">
+          </div>
+        `;
+      }
+
+      // removing a route input
+      removeAreaBtn.onclick = () => {
+        if (areaAddedCount !== 0) {
+          $(`#areaInputGroup${areaAddedCount}`).remove();
+          areaAddedCount--; 
+        }
+        else {
+          alert('no more area to remove!');
+        }
+      }
+
+    document.getElementById('addPackageButton').onclick = () => {
+      const origin = originInput.value; 
+      const destination = destinationInput.value; 
+      const distanceInKm = distanceInKmInput.value; 
+      const currentLocation = currentLocationInput.value; 
+      const status = statusInput.value; 
+      const paymode = paymodeInput.value; 
+      const boxSize = boxSizeInput.value; 
+      const areasToPassArray = [];
+
+      if (areaAddedCount !== 0) {
+        for (let i = 1; i <= areaAddedCount; i++) {
+          const areaToPassInput = document.getElementById(`areaToPassInput${i}`);
+          areasToPassArray.push(areaToPassInput.value);
+        }
+      }
+
+      console.log(areasToPassArray)
+
+      const zomeURL = `/createPackage/${encodeURIComponent('59e649e8110f0b163a701e8d')}/${encodeURIComponent(origin)}/${encodeURIComponent(destination)}/${encodeURIComponent(areasToPassArray)}/${encodeURIComponent(distanceInKm)}/${encodeURIComponent(currentLocation)}/${encodeURIComponent(status)}/${encodeURIComponent(paymode)}/${encodeURIComponent(boxSize)}`;
+      console.log(zomeURL)
+
+      doAjax(zomeURL, (result) => { alert(`attempted to add`) }, 'POST');
+    }
+
+    doAjax(`/getPackages/${encodeURIComponent('59e649e8110f0b163a701e8d')}`, (packages) => {
       const addedPackagesContainer = document.getElementById('addedPackagesContainer');
       addedPackagesContainer.innerHTML = '';
 
@@ -101,8 +161,8 @@ window.onload = () => {
           <div><i class="fa fa-archive" aria-hidden="true"></i> package id: ${package._id}</div>
         `
       } 
-    });
-
+    }, 'GET');
+ 
     // for finding packages
     const findPackageInput = document.getElementById('findPackageInput');
 
@@ -152,7 +212,7 @@ window.onload = () => {
           </div>
           <hr>
         `;
-      })
+      }, 'GET')
     }
   })
 }
