@@ -27,14 +27,14 @@ MongoClient.connect(url, (error, db) => {
         mobileNumber: request.body.mobileNumber, 
         address: request.body.address,
       }, (insertErr, result) => {
-        if (insertErr) { console.log('customer cannot be inserted!', error) }
+        if (insertErr) { console.log('customer cannot be inserted!', insertErr) }
         else { response.end(); }
       })
     });
 
     app.get('/getCustomers', (request, response) => {
       db.collection('customers').find().toArray((readErr, customers) => {
-        if (readErr) { console.log('error viewing all customers!', error) }
+        if (readErr) { console.log('error viewing all customers!', readErr) }
         else { response.json(customers) }
       })
     })
@@ -45,8 +45,16 @@ MongoClient.connect(url, (error, db) => {
       db.collection('customers').find({ 
         name: { $regex: nameRegex } 
       }).toArray((readErr, customers) => {
-        if (readErr) { console.log('error finding a customer!', error) }
+        if (readErr) { console.log('error finding a customer!', readErr) }
         else { response.json(customers) }
+      })
+    })
+
+    app.get('/removeCustomer/:customerId', (request, response) => {
+      db.collection('customers').deleteOne({ _id: ObjectId(request.params.customerId) }, 
+      (deleteError, result) => {
+        if (deleteError) { console.log('error delete a customer ', deleteError) }
+        else { response.json(result) }
       })
     })
 
@@ -74,7 +82,7 @@ MongoClient.connect(url, (error, db) => {
         price: computedPrice,
         transactionDate: new Date()
       }, (insertErr, result) => {
-        if (insertErr) { console.log('package cannot be inserted!', error) }
+        if (insertErr) { console.log('package cannot be inserted!', insertErr) }
         else { response.json(result) }
       })
     });
@@ -83,7 +91,7 @@ MongoClient.connect(url, (error, db) => {
       db.collection('packages').find({
         customerId: ObjectId(request.params.customerId)
       }).toArray((readErr, packages) => {
-        if (readErr) { console.log('package cannot be read!', error) }
+        if (readErr) { console.log('package cannot be read!', readErr) }
         else { response.json(packages) }
       })
     })
@@ -92,14 +100,14 @@ MongoClient.connect(url, (error, db) => {
       db.collection('packages').findOne({ 
         _id: ObjectId(request.params.packageId) 
       }, (readErr, package) => {
-        if (readErr) { console.log('error finding a package!', error) }
+        if (readErr) { console.log('error finding a package!', readErr) }
         else { response.json(package) }
       })
     })
 
     app.get('/getCoveredAreas', (request, response) => {
       db.collection('coveredAreas').find().toArray((readErr, areas) => {
-        if (readErr) { console.log('error retrieving covered areas ', error) }
+        if (readErr) { console.log('error retrieving covered areas ', readErr) }
         else { response.json(areas) }
       })
     })

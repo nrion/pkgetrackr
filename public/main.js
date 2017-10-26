@@ -36,22 +36,6 @@ window.onload = () => {
 
     function loopCustomers(customers, container) {
       for (const customer of customers) {
-        // container.innerHTML += `
-        //   <div class="row">
-        //     <div class="col-sm-8"><h5><i class="fa fa-user-o" aria-hidden="true"></i> <strong>${customer.name}</strong></h5></div>
-        //     <div class="col-md-auto ml-auto mb-1">
-        //       <button type="button" class="btn btn-light btn-sm">view packages</button>
-        //       <button type="button" class="btn btn-light btn-sm">edit</button>
-        //       <button type="button" class="btn btn-light btn-sm">delete</button>
-        //     </div>
-        //   </div>
-        //   <div class="row">
-        //     <div class="col-lg-3"><i class="fa fa-envelope-o" aria-hidden="true"></i> ${customer.email}</div>
-        //     <div class="col-lg-2"><i class="fa fa-mobile" aria-hidden="true"></i> ${customer.mobileNumber}</div>
-        //     <div class="col-md-auto"><i class="fa fa-address-book-o" aria-hidden="true"></i> ${customer.address}</div>
-        //   </div>
-        //   <hr>
-        // `;
         container.innerHTML += `
           <div class="card border-dark mb-3" style="max-width: 40rem;">
             <div class="card-body text-dark">
@@ -63,7 +47,7 @@ window.onload = () => {
             <div class="card-footer text-right">
               <button type="button" class="btn btn-dark btn-sm">packages</button>
               <button type="button" class="btn btn-dark btn-sm">edit</button>
-              <button type="button" class="btn btn-dark btn-sm">delete</button>
+              <button type="button" class="btn btn-dark btn-sm delButtons" value="${customer._id}">delete</button>
             </div>
           </div>
         `;  
@@ -76,6 +60,7 @@ window.onload = () => {
       customersContainer.innerHTML = '';
 
       loopCustomers(customers, customersContainer); 
+      prepareDelButton()
     }, 'GET')
 
     // finding a certain customer
@@ -87,7 +72,23 @@ window.onload = () => {
         findCustomersContainer.innerHTML = '';
 
         loopCustomers(customers, findCustomersContainer)
+        prepareDelButton()
       }, 'GET')
+    }
+
+    function prepareDelButton() {
+      const deleteButtons = document.getElementsByClassName('delButtons'); 
+
+      if (deleteButtons.length > 0) {
+        for (let i = 0; i < deleteButtons.length; i++) {
+          console.log('here here')
+          deleteButtons[i].onclick = () => {
+            doAjax(`/removeCustomer/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
+              alert('delete successful')
+            }, 'GET')
+          }
+        }
+      }
     }
   });
 
