@@ -227,7 +227,7 @@ window.onload = () => {
             <div class="card-footer text-right">
               <button type="button" class="btn btn-dark btn-sm">packages</button>
               <button type="button" class="btn btn-dark btn-sm">edit</button>
-              <button toriginype="button" class="btn btn-dark btn-sm">delete</button>
+              <button toriginype="button" value="${package._id}" class="btn btn-dark btn-sm removePackageButtons">delete</button>
             </div>
           </div>
         `;  
@@ -239,7 +239,7 @@ window.onload = () => {
       const packagesContainer = document.getElementById('allPackagesContainer');
 
       displayPackages(packages, packagesContainer);
-      // prepareDelButton()
+      armPkgeDelButton()
     }, 'GET')
  
     // for finding packages
@@ -258,7 +258,22 @@ window.onload = () => {
         const packagesFoundContainer = document.getElementById('packageContainer'); 
 
         displayPackages(packagesFound, packagesFoundContainer);
+        armPkgeDelButton()
       }, 'GET')
+    }
+
+    function armPkgeDelButton() {
+      const deleteButtons = document.getElementsByClassName('removePackageButtons'); 
+
+      if (deleteButtons.length > 0) {
+        for (let i = 0; i < deleteButtons.length; i++) {
+          deleteButtons[i].onclick = () => {
+            doAjax(`/removePackage/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
+              alert('delete successful')
+            }, 'GET')
+          }
+        }
+      }
     }
   })
 }

@@ -103,6 +103,14 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
+    app.get('/removePackage/:packageId', (request, response) => {
+      db.collection('packages').deleteOne({ _id: ObjectId(request.params.packageId) }, 
+      (deleteError, result) => {
+        if (deleteError) { console.log('error delete a package ', deleteError) }
+        else { response.json(result) }
+      })
+    })
+
     app.get('/findPackage/:packageId', (request, response) => {
       db.collection('packages').find({ 
         _id: ObjectId(request.params.packageId) 
