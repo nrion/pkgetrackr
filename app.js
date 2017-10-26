@@ -104,11 +104,11 @@ MongoClient.connect(url, (error, db) => {
     })
 
     app.get('/findPackage/:packageId', (request, response) => {
-      db.collection('packages').findOne({ 
+      db.collection('packages').find({ 
         _id: ObjectId(request.params.packageId) 
-      }, (readErr, package) => {
+      }).toArray((readErr, packages) => {
         if (readErr) { console.log('error finding a package!', readErr) }
-        else { response.json(package) }
+        else { response.json(packages) }
       })
     })
 

@@ -188,25 +188,41 @@ window.onload = () => {
         }, 'GET');
     }
 
-    // displaying all packages
-    doAjax(`/getAllPackages`, (packages) => {
-      const packagesContainer = document.getElementById('allPackagesContainer');
-      packagesContainer.innerHTML = '';
+    function displayPackages(whichObject, whichContainer) {
+      whichContainer.innerHTML = '';
 
-      for (const package of packages) {
-        packagesContainer.innerHTML += `
+      for (const package of whichObject) {
+        let areaList = '';
+
+        for (const area of package.areasToPass) {
+          areaList += `
+            <li id="areaList" class="list-group-item"><i class="fa fa-hand-o-right" aria-hidden="true"></i> ${area}</li>
+          `;package
+        }
+
+        whichContainer.innerHTML += `
           <div class="card border-dark mb-3">
             <div class="card-body text-dark">
               <div><h5>package id: <i class="fa fa-archive" aria-hidden="true"></i> <strong>${package._id}</strong></h5></div>
-              ${displayAttribute('globe', 'origin', `${package.origin}`)}
-              ${displayAttribute('plane', 'destination', `${package.destination}`)}
-              ${displayAttribute('map-signs', 'areas to pass', `${package.areasToPass}`)}
-              ${displayAttribute('map-marker', 'current location', `${package.currentLocation}`)}
-              ${displayAttribute('spinner', 'status', `${package.status}`)}
-              ${displayAttribute('shopping-cart', 'paymode', `${package.paymode}`)}
-              ${displayAttribute('balance-scale', 'size', `${package.boxSize}`)}
-              ${displayAttribute('money', 'price', `&#8369 ${package.price}`)}
-              ${displayAttribute('calendar', 'transaction date', `${package.transactionDate}`)}
+              <ul class="list-group">
+                <li id="activeArea" class="list-group-item list-group-item-action list-group-item-dark" >description</li>
+                <li class="list-group-item">
+                  ${displayAttribute('globe', 'origin', `${package.origin}`)}
+                  ${displayAttribute('plane', 'destination', `${package.destination}`)}
+                  ${displayAttribute('map-marker', 'current', `${package.currentLocation}`)}
+                  ${displayAttribute('spinner', 'status', `${package.status}`)}
+                  ${displayAttribute('shopping-cart', 'paymode', `${package.paymode}`)}
+                  ${displayAttribute('balance-scale', 'size', `${package.boxSize}`)}
+                  ${displayAttribute('money', 'price', `&#8369 ${package.price}`)}
+                </li>
+                <li id="activeArea" class="list-group-item list-group-item-action list-group-item-dark"><i class="fa fa-map-signs" aria-hidden="true"></i> areas to pass</li>
+                ${areaList}
+                <li class="list-group-item">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                  transaction date
+                  <br> ${package.transactionDate}
+                </li>
+              </ul>
             </div>
             <div class="card-footer text-right">
               <button type="button" class="btn btn-dark btn-sm">packages</button>
@@ -216,7 +232,13 @@ window.onload = () => {
           </div>
         `;  
       }
+    }
 
+    // displaying all packages
+    doAjax(`/getAllPackages`, (packages) => {
+      const packagesContainer = document.getElementById('allPackagesContainer');
+
+      displayPackages(packages, packagesContainer);
       // prepareDelButton()
     }, 'GET')
  
@@ -224,9 +246,6 @@ window.onload = () => {
     const findPackageInput = document.getElementById('findPackageInput');
 
     function displayAttribute(glyphicon, attributeName, attribute) {
-      if (attributeName  === 'areas to pass') {
-        
-      }
       return `
         <div class="row">
           <div class="col-6"><i class="fa fa-${glyphicon}" aria-hidden="true"></i> ${attributeName}</div>
@@ -235,31 +254,10 @@ window.onload = () => {
     }
 
     findPackageInput.onkeyup = () => {
-    doAjax(`/findPackage/${encodeURIComponent(findPackageInput.value)}`, (package) => {
-        const packageContainer = document.getElementById('packageContainer'); 
+    doAjax(`/findPackage/${encodeURIComponent(findPackageInput.value)}`, (packagesFound) => {
+        const packagesFoundContainer = document.getElementById('packageContainer'); 
 
-        packageContainer.innerHTML = '';
-        packageContainer.innerHTML += `
-          <div class="card border-dark mb-3">
-            <div class="card-body text-dark">
-              <div><h5>package id: <i class="fa fa-archive" aria-hidden="true"></i> <strong>${package._id}</strong></h5></div>
-              ${displayAttribute('globe', 'origin', `${package.origin}`)}
-              ${displayAttribute('plane', 'destination', `${package.destination}`)}
-              ${displayAttribute('map-signs', 'areas to pass', `${package.areasToPass}`)}
-              ${displayAttribute('map-marker', 'current location', `${package.currentLocation}`)}
-              ${displayAttribute('spinner', 'status', `${package.status}`)}
-              ${displayAttribute('shopping-cart', 'paymode', `${package.paymode}`)}
-              ${displayAttribute('balance-scale', 'size', `${package.boxSize}`)}
-              ${displayAttribute('money', 'price', `&#8369 ${package.price}`)}
-              ${displayAttribute('calendar', 'transaction date', `${package.transactionDate}`)}
-            </div>
-            <div class="card-footer text-right">
-              <button type="button" class="btn btn-dark btn-sm">packages</button>
-              <button type="button" class="btn btn-dark btn-sm">edit</button>
-              <button toriginype="button" class="btn btn-dark btn-sm">delete</button>
-            </div>
-          </div>
-        `;
+        displayPackages(packagesFound, packagesFoundContainer);
       }, 'GET')
     }
   })

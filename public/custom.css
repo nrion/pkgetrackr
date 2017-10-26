@@ -49,3 +49,15 @@
     width: 100%;
   }
 }
+
+#areaList {
+  padding-top: 2px; 
+  padding-bottom: 2px; 
+  border-radius: 0px;
+}
+
+#activeArea {
+  padding: 4px; 
+  text-align: center; 
+  border-radius: 0px;
+}
