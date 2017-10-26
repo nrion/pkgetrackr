@@ -39,6 +39,20 @@ window.onload = () => {
   prepairLinkForSwitchingView(customersViewLink, customersView, () => {
     console.log('switched to customers view');
 
+    document.getElementById('customerRegistrationBtn').onclick = () => {
+      const name = document.getElementById('nameInput').value;
+      const email = document.getElementById('emailInput').value;
+      const password = document.getElementById('passwordInput').value;
+      const mobileNumber = document.getElementById('mobileNumberInput').value;
+      const address = document.getElementById('addressInput').value;
+  
+      const registrationUrl = `/createCustomer/${encodeURIComponent(name)}/${encodeURIComponent(email)}/${encodeURIComponent(password)}/${encodeURIComponent(mobileNumber)}/${encodeURIComponent(address)}`;
+      doAjax(registrationUrl, (result) => { 
+        alert(`ADDED SUCCESSFULY!`); 
+        simulatePageRefresh(customersViewLink, '#home') 
+      }, 'POST');
+    }
+
     function loopCustomers(customers, container) {
       for (const customer of customers) {
         container.innerHTML += `
@@ -182,7 +196,10 @@ window.onload = () => {
       }
 
       const zomeURL = `/createPackage/${encodeURIComponent(customerId)}/${encodeURIComponent(origin)}/${encodeURIComponent(destination)}/${encodeURIComponent(areasToPassArray)}/${encodeURIComponent(distanceInKm)}/${encodeURIComponent(currentLocation)}/${encodeURIComponent(status)}/${encodeURIComponent(paymode)}/${encodeURIComponent(boxSize)}`;
-      doAjax(zomeURL, (result) => { alert(`attempted to add`) }, 'POST');
+      doAjax(zomeURL, (result) => { 
+        alert(`PACKAGE ADDED SUCCESSFULLY!`) 
+        simulatePageRefresh(packagesViewLink, '#home') 
+      }, 'POST');
     }
 
     // for package registration form - enumerating packages

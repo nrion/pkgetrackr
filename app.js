@@ -19,16 +19,18 @@ MongoClient.connect(url, (error, db) => {
   else { 
     console.log('db created!');
     
-    app.post('/createCustomer', (request, response) => {
+    const customerUrl = `/createCustomer/:name/:email/:password/:mobileNumber/:address`
+
+    app.post(customerUrl, (request, response) => {
       db.collection('customers').insertOne({ 
-        name: request.body.name, 
-        email: request.body.email, 
-        password: request.body.password, 
-        mobileNumber: request.body.mobileNumber, 
-        address: request.body.address,
+        name: request.params.name, 
+        email: request.params.email, 
+        password: request.params.password, 
+        mobileNumber: request.params.mobileNumber, 
+        address: request.params.address,
       }, (insertErr, result) => {
         if (insertErr) { console.log('customer cannot be inserted!', insertErr) }
-        else { response.end(); }
+        else { response.json(result); }
       })
     });
 
