@@ -96,6 +96,13 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
+    app.get('/getAllPackages', (request, response) => {
+      db.collection('packages').find().toArray((readErr, packages) => {
+        if (readErr) { console.log('error viewing all customers!', readErr) }
+        else { response.json(packages) }
+      })
+    })
+
     app.get('/findPackage/:packageId', (request, response) => {
       db.collection('packages').findOne({ 
         _id: ObjectId(request.params.packageId) 

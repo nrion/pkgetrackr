@@ -151,10 +151,10 @@
             <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">package registration</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">package tracker</a>
+            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">all packages</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">another slot</a>
+            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">package tracker</a>
           </li>
         </ul>
         <div class="tab-content" id="myTabContent">
@@ -243,7 +243,15 @@
               </div>
             </main>
           </div>
-          <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
+          <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+            <main role="main" class="mt-4 container">
+              <h5>all packages</h5>
+              <hr>
+              <div class="card-columns" id="allPackagesContainer">
+                <!-- do ajax here -->
+              </div>
+            </main>
+          </div>
         </div>
       </div>
     </template>

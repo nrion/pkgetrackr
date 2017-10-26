@@ -187,15 +187,50 @@ window.onload = () => {
           } 
         }, 'GET');
     }
+
+    // displaying all packages
+    doAjax(`/getAllPackages`, (packages) => {
+      const packagesContainer = document.getElementById('allPackagesContainer');
+      packagesContainer.innerHTML = '';
+
+      for (const package of packages) {
+        packagesContainer.innerHTML += `
+          <div class="card border-dark mb-3">
+            <div class="card-body text-dark">
+              <div><h5>package id: <i class="fa fa-archive" aria-hidden="true"></i> <strong>${package._id}</strong></h5></div>
+              ${displayAttribute('globe', 'origin', `${package.origin}`)}
+              ${displayAttribute('plane', 'destination', `${package.destination}`)}
+              ${displayAttribute('map-signs', 'areas to pass', `${package.areasToPass}`)}
+              ${displayAttribute('map-marker', 'current location', `${package.currentLocation}`)}
+              ${displayAttribute('spinner', 'status', `${package.status}`)}
+              ${displayAttribute('shopping-cart', 'paymode', `${package.paymode}`)}
+              ${displayAttribute('balance-scale', 'size', `${package.boxSize}`)}
+              ${displayAttribute('money', 'price', `&#8369 ${package.price}`)}
+              ${displayAttribute('calendar', 'transaction date', `${package.transactionDate}`)}
+            </div>
+            <div class="card-footer text-right">
+              <button type="button" class="btn btn-dark btn-sm">packages</button>
+              <button type="button" class="btn btn-dark btn-sm">edit</button>
+              <button toriginype="button" class="btn btn-dark btn-sm">delete</button>
+            </div>
+          </div>
+        `;  
+      }
+
+      // prepareDelButton()
+    }, 'GET')
  
     // for finding packages
     const findPackageInput = document.getElementById('findPackageInput');
 
     function displayAttribute(glyphicon, attributeName, attribute) {
+      if (attributeName  === 'areas to pass') {
+        
+      }
       return `
-        <div>
-          <div style="width: 12rem; display: inline-block"><i class="fa fa-${glyphicon}" aria-hidden="true"></i> ${attributeName}</div>
-          <div style="display: inline-block"><b>${attribute}</b></div>
+        <div class="row">
+          <div class="col-6"><i class="fa fa-${glyphicon}" aria-hidden="true"></i> ${attributeName}</div>
+          <div class="col-auto"><b>${attribute}</b></div>
         </div>`
     }
 
