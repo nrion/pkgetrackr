@@ -31,6 +31,11 @@ window.onload = () => {
     console.log('switched to home view');
   });
 
+  function simulatePageRefresh(viewLink, whichPillId) {
+    viewLink.click();
+    $(`#myTab a[href="${whichPillId}"]`).tab('show')
+  }
+
   prepairLinkForSwitchingView(customersViewLink, customersView, () => {
     console.log('switched to customers view');
 
@@ -60,7 +65,7 @@ window.onload = () => {
       customersContainer.innerHTML = '';
 
       loopCustomers(customers, customersContainer); 
-      prepareDelButton()
+      prepareDelButton('#profile')
     }, 'GET')
 
     // finding a certain customer
@@ -72,11 +77,11 @@ window.onload = () => {
         findCustomersContainer.innerHTML = '';
 
         loopCustomers(customers, findCustomersContainer)
-        prepareDelButton()
+        prepareDelButton('#contact')
       }, 'GET')
     }
 
-    function prepareDelButton() {
+    function prepareDelButton(whichNavpill) {
       const deleteButtons = document.getElementsByClassName('delButtons'); 
 
       if (deleteButtons.length > 0) {
@@ -84,12 +89,14 @@ window.onload = () => {
           console.log('here here')
           deleteButtons[i].onclick = () => {
             doAjax(`/removePackagesOfCustomer/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
-              alert('from packages of customer')
+              console.log('from packages of customer')
             }, 'GET')
 
             doAjax(`/removeCustomer/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
-              alert('delete successful')
+              console.log('delete successful')
             }, 'GET')
+
+            simulatePageRefresh(customersViewLink, whichNavpill)
           }
         }
       }
@@ -243,7 +250,7 @@ window.onload = () => {
       const packagesContainer = document.getElementById('allPackagesContainer');
 
       displayPackages(packages, packagesContainer);
-      armPkgeDelButton()
+      armPkgeDelButton('#contact')
     }, 'GET')
  
     // for finding packages
@@ -258,23 +265,24 @@ window.onload = () => {
     }
 
     findPackageInput.onkeyup = () => {
-    doAjax(`/findPackage/${encodeURIComponent(findPackageInput.value)}`, (packagesFound) => {
+      doAjax(`/findPackage/${encodeURIComponent(findPackageInput.value)}`, (packagesFound) => {
         const packagesFoundContainer = document.getElementById('packageContainer'); 
 
         displayPackages(packagesFound, packagesFoundContainer);
-        armPkgeDelButton()
+        armPkgeDelButton('#profile')
       }, 'GET')
     }
 
-    function armPkgeDelButton() {
+    function armPkgeDelButton(whichNavpill) {
       const deleteButtons = document.getElementsByClassName('removePackageButtons'); 
 
       if (deleteButtons.length > 0) {
         for (let i = 0; i < deleteButtons.length; i++) {
           deleteButtons[i].onclick = () => {
             doAjax(`/removePackage/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
-              alert('delete successful')
+              // alert('delete successful')
             }, 'GET')
+            simulatePageRefresh(packagesViewLink, whichNavpill)
           }
         }
       }
