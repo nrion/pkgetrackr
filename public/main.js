@@ -83,6 +83,10 @@ window.onload = () => {
         for (let i = 0; i < deleteButtons.length; i++) {
           console.log('here here')
           deleteButtons[i].onclick = () => {
+            doAjax(`/removePackagesOfCustomer/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
+              alert('from packages of customer')
+            }, 'GET')
+
             doAjax(`/removeCustomer/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
               alert('delete successful')
             }, 'GET')

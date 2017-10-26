@@ -58,6 +58,14 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
+    app.get('/removePackagesOfCustomer/:customerId', (request, response) => {
+      db.collection('packages').deleteMany({ customerId: ObjectId(request.params.customerId) }, 
+      (deleteError, result) => {
+        if (deleteError) { console.log('error delete packages ', deleteError) }
+        else { response.json(result) }
+      })
+    })
+
     const createPackageUrl = '/createPackage/:customerId/:origin/:destination/:areasToPass' 
       + '/:distanceInKm/:currentLocation/:status/:paymode/:boxSize';
 
