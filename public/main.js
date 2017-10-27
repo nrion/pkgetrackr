@@ -3,14 +3,14 @@ window.onload = () => {
 
   // links
   const homeViewLink = document.getElementById('homeViewLink');
-  const customersViewLink = document.getElementById('customersViewLink');
-  const packagesViewLink = document.getElementById('packagesViewLink');
+  const registrationViewLink = document.getElementById('registrationViewLink');
+  const databaseViewLink = document.getElementById('databaseViewLink');
 
   // templates
   const adminLoginView = document.getElementById('adminLoginView');
   const homeView = document.getElementById('homeView');
-  const customersView = document.getElementById('customersView');
-  const packagesView = document.getElementById('packagesView');
+  const registrationView = document.getElementById('registrationView');
+  const databaseView = document.getElementById('databaseView');
 
   function setContentView(view) {
     bodyContent.innerHTML = view.innerHTML;
@@ -21,8 +21,13 @@ window.onload = () => {
       event.preventDefault();
       setContentView(view);
 
-      command()
+      command();
     }
+  }
+
+  function simulatePageRefresh(viewLink, whichPillId) {
+    viewLink.click();
+    $(`#myTab a[href="${whichPillId}"]`).tab('show')
   }
  
   setContentView(homeView);
@@ -31,102 +36,31 @@ window.onload = () => {
     console.log('switched to home view');
   });
 
-  function simulatePageRefresh(viewLink, whichPillId) {
-    viewLink.click();
-    $(`#myTab a[href="${whichPillId}"]`).tab('show')
-  }
+  prepairLinkForSwitchingView(registrationViewLink, registrationView, () => {
+    console.log('switched to registration view');
 
-  prepairLinkForSwitchingView(customersViewLink, customersView, () => {
-    console.log('switched to customers view');
-
-    document.getElementById('customerRegistrationBtn').onclick = () => {
+    /* for customer registration */
+    // inserting customer into db
+    document.getElementById('registerCustomerBtn').onclick = () => {
       const name = document.getElementById('nameInput').value;
       const email = document.getElementById('emailInput').value;
       const password = document.getElementById('passwordInput').value;
       const mobileNumber = document.getElementById('mobileNumberInput').value;
       const address = document.getElementById('addressInput').value;
   
-      const registrationUrl = `/createCustomer/${encodeURIComponent(name)}/${encodeURIComponent(email)}/${encodeURIComponent(password)}/${encodeURIComponent(mobileNumber)}/${encodeURIComponent(address)}`;
-      doAjax(registrationUrl, (result) => { 
+      const createCustomerUrl = `/createCustomer/${encodeURIComponent(name)}/${encodeURIComponent(email)}/${encodeURIComponent(password)}/${encodeURIComponent(mobileNumber)}/${encodeURIComponent(address)}`;
+      doAjax(createCustomerUrl, (result) => { 
         alert(`ADDED SUCCESSFULY!`); 
-        simulatePageRefresh(customersViewLink, '#home') 
+        simulatePageRefresh(registrationViewLink, '#customerRegistration') 
       }, 'POST');
     }
 
-    function loopCustomers(customers, container) {
-      for (const customer of customers) {
-        container.innerHTML += `
-          <div class="card border-dark mb-3" style="max-width: 40rem;">
-            <div class="card-body text-dark">
-              <h5><i class="fa fa-user-o" aria-hidden="true"></i> <strong>${customer.name}</strong></h5>
-              <div><i class="fa fa-envelope-o" aria-hidden="true"></i> ${customer.email}</div>
-              <div><i class="fa fa-mobile" aria-hidden="true"></i> ${customer.mobileNumber}</div>
-              <div><i class="fa fa-address-book-o" aria-hidden="true"></i> ${customer.address}</div>
-            </div>
-            <div class="card-footer text-right">
-              <button type="button" class="btn btn-dark btn-sm">packages</button>
-              <button type="button" class="btn btn-dark btn-sm">edit</button>
-              <button type="button" class="btn btn-dark btn-sm delButtons" value="${customer._id}">delete</button>
-            </div>
-          </div>
-        `;  
-      }
-    }
-
-    // getting all registered customers
-    doAjax(`/getCustomers`, (customers) => {
-      const customersContainer = document.getElementById('customersContainer');
-      customersContainer.innerHTML = '';
-
-      loopCustomers(customers, customersContainer); 
-      prepareDelButton('#profile')
-    }, 'GET')
-
-    // finding a certain customer
-    findCustomerInput.onkeyup = () => {
-      const findCustomerInput = document.getElementById('findCustomerInput');
-
-      doAjax(`/findCustomer/${encodeURIComponent(findCustomerInput.value)}`, (customers) => {
-        const findCustomersContainer = document.getElementById('findCustomersContainer'); 
-        findCustomersContainer.innerHTML = '';
-
-        loopCustomers(customers, findCustomersContainer)
-        prepareDelButton('#contact')
-      }, 'GET')
-    }
-
-    function prepareDelButton(whichNavpill) {
-      const deleteButtons = document.getElementsByClassName('delButtons'); 
-
-      if (deleteButtons.length > 0) {
-        for (let i = 0; i < deleteButtons.length; i++) {
-          console.log('here here')
-          deleteButtons[i].onclick = () => {
-            doAjax(`/bulkRemovePackages/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
-              console.log('deleted all packages of selected customer')
-            }, 'GET')
-
-            doAjax(`/removeCustomer/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
-              console.log('deleted customer')
-            }, 'GET')
-
-            simulatePageRefresh(customersViewLink, whichNavpill)
-          }
-        }
-      }
-    }
-  });
-
-  prepairLinkForSwitchingView(packagesViewLink, packagesView, () => {
-    // for creating packages - enumerating covered areas
+    /* for package registration */
     const customerInput = document.getElementById('customerInput');
     const originInput = document.getElementById('originInput');
     const destinationInput = document.getElementById('destinationInput');
-
-    customerInput.oninput = () => {
-      getPackageIds()
-    }
-
+    
+    // for customers dropdown
     doAjax('/getCustomers', (customers) => {
       customerInput.innerHTML = '';
 
@@ -135,6 +69,21 @@ window.onload = () => {
       }
     }, 'GET')
 
+    customerInput.oninput = () => {
+      doAjax(`/getPackageIds/${encodeURIComponent(customerInput.value)}`, (packageIds) => {
+        const addedPackagesContainer = document.getElementById('addedPackagesContainer');
+        addedPackagesContainer.innerHTML = '';
+
+        for (const packageId of packageIds) {
+          console.log(typeof package)
+          addedPackagesContainer.innerHTML += `
+            <div><i class="fa fa-archive" aria-hidden="true"></i> package id: ${packageId}</div>
+          `
+        } 
+      }, 'GET');
+    }
+
+    // for origin & destination dropdowns
     doAjax('/getCoveredAreas', (areas) => {
       originInput.innerHTML = '';
       destinationInput.innerHTML = '';
@@ -146,18 +95,14 @@ window.onload = () => {
         destinationInput.innerHTML += optionTag; 
       }
     }, 'GET')
-
-    // for routes
-    const areasToPassInputs = document.getElementById('areasToPassInputs');
-    const addAreaBtn = document.getElementById('addAreaBtn');
-    const removeAreaBtn = document.getElementById('removeAreaBtn');
     
+    // for adding area input field
     let areaAddedCount = 0; 
 
-    addAreaBtn.onclick = () => {
+    document.getElementById('addAreaBtn').onclick = () => {
       areaAddedCount++;
 
-      areasToPassInputs.innerHTML += `
+      document.getElementById('routeInputsContainer').innerHTML += `
         <div class="input-group mt-1" id="areaInputGroup${areaAddedCount}">
           <span class="input-group-addon" id="basic-addon3">${areaAddedCount}</span>
           <input type="text" class="form-control" id="areaToPassInput${areaAddedCount}" name="areaToPass" placeholder="where should it pass?">
@@ -165,18 +110,18 @@ window.onload = () => {
       `;
     }
 
-    // removing a route input
-    removeAreaBtn.onclick = () => {
+    // for removing area input field
+    document.getElementById('removeAreaBtn').onclick = () => {
       if (areaAddedCount !== 0) {
         $(`#areaInputGroup${areaAddedCount}`).remove();
         areaAddedCount--; 
       }
       else {
-        alert('no more area to remove!');
+        alert('no more area input to remove!');
       }
     }
 
-    // inserting a package into the db
+    // inserting package into db
     document.getElementById('addPackageButton').onclick = () => {
       const customerId = customerInput.value; 
       const origin = originInput.value; 
@@ -199,23 +144,40 @@ window.onload = () => {
       const zomeURL = `/createPackage/${encodeURIComponent(customerId)}/${encodeURIComponent(origin)}/${encodeURIComponent(destination)}/${encodeURIComponent(areasToPassArray)}/${encodeURIComponent(distanceInKm)}/${encodeURIComponent(currentLocation)}/${encodeURIComponent(status)}/${encodeURIComponent(paymode)}/${encodeURIComponent(boxSize)}/${encodeURIComponent(declaredValue)}`;
       doAjax(zomeURL, (result) => { 
         alert(`PACKAGE ADDED SUCCESSFULLY!`) 
-        simulatePageRefresh(packagesViewLink, '#home') 
+        simulatePageRefresh(databaseViewLink, '#packageRegistration') 
       }, 'POST');
     }
+  });
 
-    // for package registration form - enumerating packages
-    function getPackageIds() {
-        doAjax(`/getPackageIds/${encodeURIComponent(customerInput.value)}`, (packageIds) => {
-          const addedPackagesContainer = document.getElementById('addedPackagesContainer');
-          addedPackagesContainer.innerHTML = '';
+  prepairLinkForSwitchingView(databaseViewLink, databaseView, () => {
+    console.log('switched to customers view');
 
-          for (const packageId of packageIds) {
-            console.log(typeof package)
-            addedPackagesContainer.innerHTML += `
-              <div><i class="fa fa-archive" aria-hidden="true"></i> package id: ${packageId}</div>
-            `
-          } 
-        }, 'GET');
+    function loopCustomers(customers, container) {
+      for (const customer of customers) {
+        container.innerHTML += `
+          <div class="card border-dark mb-3" style="max-width: 40rem;">
+            <div class="card-body text-dark">
+              <h5><i class="fa fa-user-o" aria-hidden="true"></i> <strong>${customer.name}</strong></h5>
+              <div><i class="fa fa-envelope-o" aria-hidden="true"></i> ${customer.email}</div>
+              <div><i class="fa fa-mobile" aria-hidden="true"></i> ${customer.mobileNumber}</div>
+              <div><i class="fa fa-address-book-o" aria-hidden="true"></i> ${customer.address}</div>
+            </div>
+            <div class="card-footer text-right">
+              <button type="button" class="btn btn-dark btn-sm">packages</button>
+              <button type="button" class="btn btn-dark btn-sm">edit</button>
+              <button type="button" class="btn btn-dark btn-sm delButtons" value="${customer._id}">delete</button>
+            </div>
+          </div>
+        `;  
+      }
+    }
+
+    function displayAttribute(glyphicon, attributeName, attribute) {
+      return `
+        <div class="row">
+          <div class="col-6"><i class="fa fa-${glyphicon}" aria-hidden="true"></i> ${attributeName}</div>
+          <div class="col-auto"><b>${attribute}</b></div>
+        </div>`
     }
 
     function displayPackages(whichObject, whichContainer) {
@@ -268,52 +230,67 @@ window.onload = () => {
       }
     }
 
-    // displaying all packages
+    function prepareDelButton(whichNavpill, firstRoute, secondRoute) {
+      const deleteButtons = document.getElementsByClassName('delButtons'); 
+
+      if (deleteButtons.length > 0) {
+        for (let i = 0; i < deleteButtons.length; i++) {
+          console.log('here here')
+          deleteButtons[i].onclick = () => {
+            doAjax(`/${firstRoute}/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
+              console.log(`/${firstRoute} delete successful!`)
+            }, 'GET')
+
+            doAjax(`/${secondRoute}/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
+              console.log(`/${secondRoute} delete successful!`)
+            }, 'GET')
+
+            simulatePageRefresh(databaseViewLink, whichNavpill)
+          }
+        }
+      }
+    }
+
+    // all customers
+    doAjax(`/getCustomers`, (customers) => {
+      const allCustomersContainer = document.getElementById('allCustomersContainer');
+      allCustomersContainer.innerHTML = '';
+
+      loopCustomers(customers, allCustomersContainer); 
+      prepareDelButton('#allCustomers', 'bulkRemovePackages', 'removeCustomer')
+    }, 'GET')
+
+    // all packages
     doAjax(`/getAllPackages`, (packages) => {
       const packagesContainer = document.getElementById('allPackagesContainer');
 
       displayPackages(packages, packagesContainer);
-      armPkgeDelButton('#contact')
+      prepareDelButton('#findCustomer', 'removePackageReference', 'removePackage')
     }, 'GET')
- 
-    // for finding packages
-    const findPackageInput = document.getElementById('findPackageInput');
 
-    function displayAttribute(glyphicon, attributeName, attribute) {
-      return `
-        <div class="row">
-          <div class="col-6"><i class="fa fa-${glyphicon}" aria-hidden="true"></i> ${attributeName}</div>
-          <div class="col-auto"><b>${attribute}</b></div>
-        </div>`
-    }
+    // find customer
+    const findCustomerInput = document.getElementById('findCustomerInput');
 
-    findPackageInput.onkeyup = () => {
-      doAjax(`/findPackage/${encodeURIComponent(findPackageInput.value)}`, (packagesFound) => {
-        const packagesFoundContainer = document.getElementById('packageContainer'); 
+    findCustomerInput.onkeyup = () => {
+      doAjax(`/findCustomer/${encodeURIComponent(findCustomerInput.value)}`, (customers) => {
+        const findCustomerContainer = document.getElementById('findCustomerContainer'); 
+        findCustomerContainer.innerHTML = '';
 
-        displayPackages(packagesFound, packagesFoundContainer);
-        armPkgeDelButton('#profile')
+        loopCustomers(customers, findCustomerContainer)
+        prepareDelButton('#allCustomers', 'bulkRemovePackages', 'removeCustomer')
       }, 'GET')
     }
 
-    function armPkgeDelButton(whichNavpill) {
-      const deleteButtons = document.getElementsByClassName('removePackageButtons'); 
+    // for finding packages
+    const findPackageInput = document.getElementById('findPackageInput');
 
-      if (deleteButtons.length > 0) {
-        for (let i = 0; i < deleteButtons.length; i++) {
-          deleteButtons[i].onclick = () => {
-            doAjax(`/removePackageReference/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
-              // alert('delete successful')
-            }, 'GET')
+    findPackageInput.onkeyup = () => {
+      doAjax(`/findPackage/${encodeURIComponent(findPackageInput.value)}`, (packagesFound) => {
+        const packagesFoundContainer = document.getElementById('findPackageContainer'); 
 
-            doAjax(`/removePackage/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
-              // alert('delete successful')
-            }, 'GET')
-
-            simulatePageRefresh(packagesViewLink, whichNavpill)
-          }
-        }
-      }
+        displayPackages(packagesFound, packagesFoundContainer);
+        prepareDelButton('#findCustomer', 'removePackageReference', 'removePackage')
+      }, 'GET')
     }
   })
 }
