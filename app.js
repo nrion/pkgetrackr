@@ -98,7 +98,7 @@ MongoClient.connect(url, (error, db) => {
     })
 
     const createPackageUrl = '/createPackage/:customerId/:origin/:destination/:areasToPass' 
-      + '/:distanceInKm/:currentLocation/:status/:paymode/:boxSize';
+      + '/:distanceInKm/:currentLocation/:status/:paymode/:boxSize/:declaredValue';
     
       app.post(createPackageUrl, (request, response) => {
       const routes = request.params.areasToPass; 
@@ -114,7 +114,7 @@ MongoClient.connect(url, (error, db) => {
         status: request.params.status,
         paymode: request.params.paymode,
         boxSize: request.params.boxSize, 
-        // declaredValue: request.params.declaredValue,
+        declaredValue: request.params.declaredValue,
         price: computedPrice,
         transactionDate: new Date()
       }, (insertErr, result) => {
@@ -141,7 +141,7 @@ MongoClient.connect(url, (error, db) => {
     app.get('/getPackageIds/:customerId', (request, response) => {
       db.collection('customers').findOne(
         { _id: ObjectId(request.params.customerId) }, 
-        { packages: 1 }, (findErr, result) => { // result returns { _id, packages [] }
+        { packages: 1 }, (findErr, result) => {
           if (findErr) {
             console.log('/getPackages findErr ', findErr)
           }

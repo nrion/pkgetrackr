@@ -186,6 +186,7 @@ window.onload = () => {
       const status = document.getElementById('statusInput').value; 
       const paymode = document.getElementById('paymodeInput').value; 
       const boxSize = document.getElementById('boxSizeInput').value; 
+      const declaredValue = document.getElementById('declaredValueInput').value; 
       const areasToPassArray = [];
 
       if (areaAddedCount !== 0) {
@@ -195,7 +196,7 @@ window.onload = () => {
         }
       }
 
-      const zomeURL = `/createPackage/${encodeURIComponent(customerId)}/${encodeURIComponent(origin)}/${encodeURIComponent(destination)}/${encodeURIComponent(areasToPassArray)}/${encodeURIComponent(distanceInKm)}/${encodeURIComponent(currentLocation)}/${encodeURIComponent(status)}/${encodeURIComponent(paymode)}/${encodeURIComponent(boxSize)}`;
+      const zomeURL = `/createPackage/${encodeURIComponent(customerId)}/${encodeURIComponent(origin)}/${encodeURIComponent(destination)}/${encodeURIComponent(areasToPassArray)}/${encodeURIComponent(distanceInKm)}/${encodeURIComponent(currentLocation)}/${encodeURIComponent(status)}/${encodeURIComponent(paymode)}/${encodeURIComponent(boxSize)}/${encodeURIComponent(declaredValue)}`;
       doAjax(zomeURL, (result) => { 
         alert(`PACKAGE ADDED SUCCESSFULLY!`) 
         simulatePageRefresh(packagesViewLink, '#home') 
@@ -225,7 +226,7 @@ window.onload = () => {
 
         for (const area of package.areasToPass) {
           areaList += `
-            <li id="areaList" class="list-group-item"><i class="fa fa-hand-o-right" aria-hidden="true"></i> ${area}</li>
+            <li id="areaList" class="list-group-item"><i class="fa fa-map-signs" aria-hidden="true"></i> ${area}</li>
           `;package
         }
 
@@ -242,9 +243,13 @@ window.onload = () => {
                   ${displayAttribute('spinner', 'status', `${package.status}`)}
                   ${displayAttribute('shopping-cart', 'paymode', `${package.paymode}`)}
                   ${displayAttribute('balance-scale', 'size', `${package.boxSize}`)}
+                </li>
+                <li id="activeArea" class="list-group-item list-group-item-action list-group-item-dark">value</li>
+                <li class="list-group-item">
+                  ${displayAttribute('money', 'declared', `&#8369 ${package.declaredValue}`)}
                   ${displayAttribute('money', 'price', `&#8369 ${package.price}`)}
                 </li>
-                <li id="activeArea" class="list-group-item list-group-item-action list-group-item-dark"><i class="fa fa-map-signs" aria-hidden="true"></i> areas to pass</li>
+                <li id="activeArea" class="list-group-item list-group-item-action list-group-item-dark">areas to pass</li>
                 ${areaList}
                 <li class="list-group-item">
                   <i class="fa fa-calendar" aria-hidden="true"></i>
@@ -304,7 +309,7 @@ window.onload = () => {
             doAjax(`/removePackage/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
               // alert('delete successful')
             }, 'GET')
-            
+
             simulatePageRefresh(packagesViewLink, whichNavpill)
           }
         }
