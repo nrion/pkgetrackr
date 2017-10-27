@@ -138,6 +138,31 @@ MongoClient.connect(url, (error, db) => {
       })
     });
 
+    app.get('/getPackagesOfCustomer/:customerId', (request, response) => {
+      db.collection('customers').findOne(
+        { _id: ObjectId(request.params.customerId) }, 
+        { packages: 1 }, (findErr, result) => {
+          if (findErr) {
+            console.log('/getPackages findErr ', findErr)
+          }
+          else {
+            if (result !== null && result.packages.length !== 0) {
+              db.collection('packages').find({
+                _id: { $in: result.packages }
+              }).toArray((findPackagesErr, packages) => {
+                if (findPackagesErr) {
+                  console.log('/getPackage findPackagesErr ', findPackagesErr);
+                }
+                else {
+                  response.json(packages);
+                }
+              })
+            }
+          }
+        }
+      )
+    })
+
     app.get('/getPackageIds/:customerId', (request, response) => {
       db.collection('customers').findOne(
         { _id: ObjectId(request.params.customerId) }, 

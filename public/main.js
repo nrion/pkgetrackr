@@ -70,14 +70,14 @@ window.onload = () => {
     }, 'GET')
 
     customerInput.oninput = () => {
-      doAjax(`/getPackageIds/${encodeURIComponent(customerInput.value)}`, (packageIds) => {
+      doAjax(`/getPackagesOfCustomer/${encodeURIComponent(customerInput.value)}`, (packages) => {
         const addedPackagesContainer = document.getElementById('addedPackagesContainer');
         addedPackagesContainer.innerHTML = '';
 
-        for (const packageId of packageIds) {
+        for (const package of packages) {
           console.log(typeof package)
           addedPackagesContainer.innerHTML += `
-            <div><i class="fa fa-archive" aria-hidden="true"></i> package id: ${packageId}</div>
+            <div><i class="fa fa-archive" aria-hidden="true"></i> package id: ${package._id}</div>
           `
         } 
       }, 'GET');
@@ -221,7 +221,7 @@ window.onload = () => {
               </ul>
             </div>
             <div class="card-footer text-right">
-              <button type="button" class="btn btn-dark btn-sm">packages</button>
+              <button type="button" class="btn btn-dark btn-sm">view owner</button>
               <button type="button" class="btn btn-dark btn-sm">edit</button>
               <button toriginype="button" value="${package._id}" class="btn btn-dark btn-sm removePackageButtons">delete</button>
             </div>
