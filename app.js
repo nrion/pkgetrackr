@@ -19,25 +19,29 @@ MongoClient.connect(url, (error, db) => {
   else { 
     console.log('db created!');
     
-    const customerUrl = `/createCustomer/:name/:email/:password/:mobileNumber/:address`
-
-    app.post(customerUrl, (request, response) => {
-      db.collection('customers').insertOne({ 
+    const createCustomerUrl = `/createCustomer/:name/:email/:password/:mobileNumber/:address`
+    app.post(createCustomerUrl, (request, response) => {
+      db.collection('customers').insertOne({
         name: request.params.name, 
         email: request.params.email, 
         password: request.params.password, 
         mobileNumber: request.params.mobileNumber, 
         address: request.params.address,
+        packages: []
       }, (insertErr, result) => {
-        if (insertErr) { console.log('customer cannot be inserted!', insertErr) }
-        else { response.json(result); }
+        if (insertErr) {
+          console.log('/createCustomer err ', insertErr);
+        }
+        response.json(result)
       })
-    });
+    })
 
     app.get('/getCustomers', (request, response) => {
       db.collection('customers').find().toArray((readErr, customers) => {
-        if (readErr) { console.log('error viewing all customers!', readErr) }
-        else { response.json(customers) }
+        if (readErr) { 
+          console.log('/getCustomers err ', readErr) 
+        }
+        response.json(customers)
       })
     })
 
@@ -47,40 +51,61 @@ MongoClient.connect(url, (error, db) => {
       db.collection('customers').find({ 
         name: { $regex: nameRegex } 
       }).toArray((readErr, customers) => {
-        if (readErr) { console.log('error finding a customer!', readErr) }
-        else { response.json(customers) }
+        if (readErr) { 
+          console.log('/findCustomer err ', readErr) 
+        }
+        response.json(customers)
       })
     })
 
     app.get('/removeCustomer/:customerId', (request, response) => {
-      db.collection('customers').deleteOne({ _id: ObjectId(request.params.customerId) }, 
-      (deleteError, result) => {
-        if (deleteError) { console.log('error delete a customer ', deleteError) }
-        else { response.json(result) }
+      db.collection('customers').deleteOne({ 
+        _id: ObjectId(request.params.customerId) 
+      }, (deleteError, result) => {
+        if (deleteError) { 
+          console.log('/removeCustomer err ', deleteError) 
+        }
+        response.json(result)
       })
     })
 
-    app.get('/removePackagesOfCustomer/:customerId', (request, response) => {
-      db.collection('packages').deleteMany({ customerId: ObjectId(request.params.customerId) }, 
-      (deleteError, result) => {
-        if (deleteError) { console.log('error delete packages ', deleteError) }
-        else { response.json(result) }
-      })
+    app.get('/bulkRemovePackages/:customerId', (request, response) => {
+      db.collection('customers').findOne(
+        { _id: ObjectId(request.params.customerId) }, 
+        { packages: 1 }, (findErr, result) => {
+          if (findErr) {
+            console.log('/bulkRemovePackages findErr ', findErr)
+          }
+          else {
+            if (result !== null && result.packages.length !== 0) {
+              db.collection('packages').deleteMany({
+                _id: { $in: result.packages }
+              }, (deleteErr, deleteResult) => {
+                if (deleteErr) {
+                  console.log('/bulkRemovePackages deleteErr ', deleteErr)
+                }
+                else {
+                  response.json(deleteResult)
+                }
+              })
+            }
+            else {
+              response.json(result); 
+            }
+          }
+        }
+      )
     })
 
     const createPackageUrl = '/createPackage/:customerId/:origin/:destination/:areasToPass' 
       + '/:distanceInKm/:currentLocation/:status/:paymode/:boxSize';
-
-    app.post(createPackageUrl, (request, response) => {
+    
+      app.post(createPackageUrl, (request, response) => {
       const routes = request.params.areasToPass; 
       const areasToPassArray = routes.split(',');
-      const computedPrice = computePrice(
-        request.params.distanceInKm, request.params.boxSize);
-
-      console.log(areasToPassArray)
+      const computedPrice = computePrice(request.params.distanceInKm, request.params.boxSize);
 
       db.collection('packages').insertOne({ 
-        customerId: ObjectId(request.params.customerId),
         origin: request.params.origin, 
         destination: request.params.destination, 
         areasToPass: areasToPassArray, 
@@ -89,35 +114,50 @@ MongoClient.connect(url, (error, db) => {
         status: request.params.status,
         paymode: request.params.paymode,
         boxSize: request.params.boxSize, 
+        // declaredValue: request.params.declaredValue,
         price: computedPrice,
         transactionDate: new Date()
       }, (insertErr, result) => {
-        if (insertErr) { console.log('package cannot be inserted!', insertErr) }
-        else { response.json(result) }
+        if (insertErr) { 
+          console.log('/createPackage err ', insertErr) 
+        }
+        else {
+          db.collection('customers').update({ 
+            _id: ObjectId(`${request.params.customerId}`)
+          }, {
+            $addToSet: { packages: result.insertedId }
+          }, (insertIdErr, insertIdResult) => {
+            if (insertIdErr) {
+              console.log('package > customer err ', insertIdErr)
+            }
+            else {
+              response.json(result)
+            }
+          })
+        }
       })
     });
 
-    app.get('/getPackages/:customerId', (request, response) => {
-      db.collection('packages').find({
-        customerId: ObjectId(request.params.customerId)
-      }).toArray((readErr, packages) => {
-        if (readErr) { console.log('package cannot be read!', readErr) }
-        else { response.json(packages) }
-      })
+    app.get('/getPackageIds/:customerId', (request, response) => {
+      db.collection('customers').findOne(
+        { _id: ObjectId(request.params.customerId) }, 
+        { packages: 1 }, (findErr, result) => { // result returns { _id, packages [] }
+          if (findErr) {
+            console.log('/getPackages findErr ', findErr)
+          }
+          else {
+            response.json(result.packages);
+          }
+        }
+      )
     })
 
     app.get('/getAllPackages', (request, response) => {
       db.collection('packages').find().toArray((readErr, packages) => {
-        if (readErr) { console.log('error viewing all customers!', readErr) }
-        else { response.json(packages) }
-      })
-    })
-
-    app.get('/removePackage/:packageId', (request, response) => {
-      db.collection('packages').deleteOne({ _id: ObjectId(request.params.packageId) }, 
-      (deleteError, result) => {
-        if (deleteError) { console.log('error delete a package ', deleteError) }
-        else { response.json(result) }
+        if (readErr) { 
+          console.log('/getAllPackages err ', readErr) 
+        }
+        response.json(packages)
       })
     })
 
@@ -125,8 +165,25 @@ MongoClient.connect(url, (error, db) => {
       db.collection('packages').find({ 
         _id: ObjectId(request.params.packageId) 
       }).toArray((readErr, packages) => {
-        if (readErr) { console.log('error finding a package!', readErr) }
-        else { response.json(packages) }
+        if (readErr) { 
+          console.log('/findPackage err ', readErr) 
+        }
+        response.json(packages)
+      })
+    })
+
+    app.get('/removePackageReference/:packageId', (request, response) => {
+      db.collection('customers')
+    })
+
+    app.get('/removePackage/:packageId', (request, response) => {
+      db.collection('packages').deleteOne({ 
+        _id: ObjectId(request.params.packageId) 
+      }, (deleteError, result) => {
+        if (deleteError) { 
+          console.log('/removePackage err ', deleteError) 
+        }
+        response.json(result)
       })
     })
 

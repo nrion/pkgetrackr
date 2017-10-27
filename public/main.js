@@ -102,12 +102,12 @@ window.onload = () => {
         for (let i = 0; i < deleteButtons.length; i++) {
           console.log('here here')
           deleteButtons[i].onclick = () => {
-            doAjax(`/removePackagesOfCustomer/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
-              console.log('from packages of customer')
+            doAjax(`/bulkRemovePackages/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
+              console.log('deleted all packages of selected customer')
             }, 'GET')
 
             doAjax(`/removeCustomer/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
-              console.log('delete successful')
+              console.log('deleted customer')
             }, 'GET')
 
             simulatePageRefresh(customersViewLink, whichNavpill)
@@ -124,7 +124,7 @@ window.onload = () => {
     const destinationInput = document.getElementById('destinationInput');
 
     customerInput.oninput = () => {
-      getPackages()
+      getPackageIds()
     }
 
     doAjax('/getCustomers', (customers) => {
@@ -203,14 +203,15 @@ window.onload = () => {
     }
 
     // for package registration form - enumerating packages
-    function getPackages() {
-        doAjax(`/getPackages/${encodeURIComponent(customerInput.value)}`, (packages) => {
+    function getPackageIds() {
+        doAjax(`/getPackageIds/${encodeURIComponent(customerInput.value)}`, (packageIds) => {
           const addedPackagesContainer = document.getElementById('addedPackagesContainer');
           addedPackagesContainer.innerHTML = '';
 
-          for (const package of packages) {
+          for (const packageId of packageIds) {
+            console.log(typeof package)
             addedPackagesContainer.innerHTML += `
-              <div><i class="fa fa-archive" aria-hidden="true"></i> package id: ${package._id}</div>
+              <div><i class="fa fa-archive" aria-hidden="true"></i> package id: ${packageId}</div>
             `
           } 
         }, 'GET');
