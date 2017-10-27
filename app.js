@@ -173,7 +173,20 @@ MongoClient.connect(url, (error, db) => {
     })
 
     app.get('/removePackageReference/:packageId', (request, response) => {
-      db.collection('customers')
+      const packageId = ObjectId(request.params.packageId);
+
+      db.collection('customers').update(
+        { packages: packageId }, 
+        { $pull: { packages: packageId } }, 
+        (updateErr, result) => {
+          if (updateErr) {
+            console.log('/removePackageReference failed ', updateErr)
+          }
+          else {
+            response.json(result)
+          }
+        }
+      )
     })
 
     app.get('/removePackage/:packageId', (request, response) => {

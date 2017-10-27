@@ -297,9 +297,14 @@ window.onload = () => {
       if (deleteButtons.length > 0) {
         for (let i = 0; i < deleteButtons.length; i++) {
           deleteButtons[i].onclick = () => {
+            doAjax(`/removePackageReference/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
+              // alert('delete successful')
+            }, 'GET')
+
             doAjax(`/removePackage/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
               // alert('delete successful')
             }, 'GET')
+            
             simulatePageRefresh(packagesViewLink, whichNavpill)
           }
         }
