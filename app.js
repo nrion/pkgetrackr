@@ -138,6 +138,19 @@ MongoClient.connect(url, (error, db) => {
       })
     });
 
+    app.get('/getOwnerOfPackage/:packageId', (request, response) => {
+      db.collection('customers').find({
+        packages: ObjectId(request.params.packageId)
+      }).toArray((readErr, result) => {
+        if (readErr) {
+          console.log('/getOwnerOfPackage err ', readerr)
+        }
+        else {
+          response.json(result);
+        }
+      })
+    })
+
     app.get('/getPackagesOfCustomer/:customerId', (request, response) => {
       db.collection('customers').findOne(
         { _id: ObjectId(request.params.customerId) }, 
@@ -157,6 +170,10 @@ MongoClient.connect(url, (error, db) => {
                   response.json(packages);
                 }
               })
+            }
+            else {
+              console.log(result)
+              response.json(result); 
             }
           }
         }

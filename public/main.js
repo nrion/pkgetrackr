@@ -163,7 +163,7 @@ window.onload = () => {
               <div><i class="fa fa-address-book-o" aria-hidden="true"></i> ${customer.address}</div>
             </div>
             <div class="card-footer text-right">
-              <button type="button" class="btn btn-dark btn-sm">packages</button>
+              <button type="button" class="btn btn-dark btn-sm packagesButtons" value="${customer._id}">packages</button>
               <button type="button" class="btn btn-dark btn-sm">edit</button>
               <button type="button" class="btn btn-dark btn-sm delButtons" value="${customer._id}">delete</button>
             </div>
@@ -221,7 +221,7 @@ window.onload = () => {
               </ul>
             </div>
             <div class="card-footer text-right">
-              <button type="button" class="btn btn-dark btn-sm">view owner</button>
+              <button type="button" class="btn btn-dark btn-sm viewOwnerButtons" value="${package._id}" >view owner</button>
               <button type="button" class="btn btn-dark btn-sm">edit</button>
               <button toriginype="button" value="${package._id}" class="btn btn-dark btn-sm removePackageButtons">delete</button>
             </div>
@@ -251,6 +251,48 @@ window.onload = () => {
       }
     }
 
+    function preparePackagesBtn() {
+      const packagesButtons = document.getElementsByClassName('packagesButtons'); 
+      const packagesModalContent = document.getElementById('packagesModalContent');
+
+      if (packagesButtons.length > 0) {
+        for (let i = 0; i < packagesButtons.length; i++) {
+          packagesButtons[i].onclick = () => {
+            doAjax(`/getPackagesOfCustomer/${encodeURIComponent(packagesButtons[i].value)}`, (packages) => {
+              console.log(`showing packages...`)
+              console.log(packages.length)
+
+              if (packages.length == undefined) {
+                alert(`This guy ain't got no package!`)
+              }
+              else {
+                displayPackages(packages, packagesModalContent);
+                $('#packagesModal').modal('show')
+              }
+
+            }, 'GET')
+          }
+        }
+      }
+    }
+
+    function prepareViewOwnerBtn() {
+      const viewOwnerButtons = document.getElementsByClassName('viewOwnerButtons'); 
+      const ownerModalContent = document.getElementById('ownerModalContent');
+
+      if (viewOwnerButtons.length > 0) {
+        for (let i = 0; i < viewOwnerButtons.length; i++) {
+          viewOwnerButtons[i].onclick = () => {
+            doAjax(`/getOwnerOfPackage/${encodeURIComponent(viewOwnerButtons[i].value)}`, (packages) => {
+              loopCustomers(packages, ownerModalContent)
+              $('#ownerModal').modal('show')
+              console.log('hah!')
+            }, 'GET')
+          }
+        }
+      }
+    }
+
     // all customers
     doAjax(`/getCustomers`, (customers) => {
       const allCustomersContainer = document.getElementById('allCustomersContainer');
@@ -258,6 +300,7 @@ window.onload = () => {
 
       loopCustomers(customers, allCustomersContainer); 
       prepareDelButton('#allCustomers', 'bulkRemovePackages', 'removeCustomer')
+      preparePackagesBtn()
     }, 'GET')
 
     // all packages
@@ -266,6 +309,7 @@ window.onload = () => {
 
       displayPackages(packages, packagesContainer);
       prepareDelButton('#findCustomer', 'removePackageReference', 'removePackage')
+      prepareViewOwnerBtn()
     }, 'GET')
 
     // find customer
@@ -278,6 +322,7 @@ window.onload = () => {
 
         loopCustomers(customers, findCustomerContainer)
         prepareDelButton('#allCustomers', 'bulkRemovePackages', 'removeCustomer')
+        preparePackagesBtn()
       }, 'GET')
     }
 
@@ -290,6 +335,7 @@ window.onload = () => {
 
         displayPackages(packagesFound, packagesFoundContainer);
         prepareDelButton('#findCustomer', 'removePackageReference', 'removePackage')
+        prepareViewOwnerBtn()
       }, 'GET')
     }
   })
