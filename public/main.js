@@ -109,10 +109,6 @@ window.onload = () => {
           <input type="text" class="form-control" id="areaToPassInput${areaAddedCount}" name="areaToPass" placeholder="where should it pass?">
         </div>
       `);
-
-      // document.getElementById('routeInputsContainer').innerHTML += `
-        
-      // `;
     }
 
     // for removing area input field
@@ -243,7 +239,7 @@ window.onload = () => {
       }
     }
 
-    function prepareBtnForClick(whichNavpill, routes, whichButtons, doWhat) { // do what is a function
+    function prepareBtnForClick(whichNavpill, routes, whichButtons, method, doWhat) { // do what is a function
       const buttons = document.getElementsByClassName(whichButtons); 
 
       if (buttons.length > 0) {
@@ -254,7 +250,7 @@ window.onload = () => {
               console.log(buttons[i].value)
               doAjax(`/${route}/${encodeURIComponent(buttons[i].value)}`, (result) => {
                 doWhat(result)
-              }, 'GET')
+              }, method)
             }
             console.log(`${routes} operations successful!`);
             simulatePageRefresh(databaseViewLink, whichNavpill)
@@ -266,10 +262,10 @@ window.onload = () => {
     function readyCustomerOperations(customers, whichContainer, whichNavpill) {
       whichContainer.innerHTML = '';
       loopCustomers(customers, whichContainer, false); 
-      prepareBtnForClick(`#${whichNavpill}`, ['bulkRemovePackages', 'removeCustomer'], 'delCustomerBtn', () => {
+      prepareBtnForClick(`#${whichNavpill}`, ['bulkRemovePackages', 'rprepareBtnForemoveCustomer'], 'delCustomerBtn', 'POST', () => {
         console.log('customer deleted')
       })
-      prepareBtnForClick(`#${whichNavpill}`, ['getPackagesOfCustomer'], 'packagesButton', (packages) => {
+      prepareBtnForClick(`#${whichNavpill}`, ['getPackagesOfCustomer'], 'packagesButton', 'GET', (packages) => {
         console.log(`showing owner...`)
         console.log(packages)
 
@@ -285,10 +281,10 @@ window.onload = () => {
 
     function readyPackageOperations(packages, whichContainer, whichNavpill) {
       displayPackages(packages, whichContainer, false);
-      prepareBtnForClick(`#${whichNavpill}`, ['removePackageReference', 'removePackage'], 'delPackageBtn', () => {
+      prepareBtnForClick(`#${whichNavpill}`, ['removePackageReference', 'removePackage'], 'delPackageBtn', 'POST', () => {
         console.log('package deleted')
       })
-      prepareBtnForClick(`#${whichNavpill}`, ['getOwnerOfPackage'], 'ownerButton', (owner) => {
+      prepareBtnForClick(`#${whichNavpill}`, ['getOwnerOfPackage'], 'ownerButton', 'GET', (owner) => {
         console.log(`showing packages...`)
         console.log(owner)
 

@@ -36,6 +36,8 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
+    // app.post()
+
     app.get('/getCustomers', (request, response) => {
       db.collection('customers').find().toArray((readErr, customers) => {
         if (readErr) { 
@@ -58,7 +60,7 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
-    app.get('/removeCustomer/:customerId', (request, response) => {
+    app.post('/removeCustomer/:customerId', (request, response) => {
       db.collection('customers').deleteOne({ 
         _id: ObjectId(request.params.customerId) 
       }, (deleteError, result) => {
@@ -69,7 +71,7 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
-    app.get('/bulkRemovePackages/:customerId', (request, response) => {
+    app.post('/bulkRemovePackages/:customerId', (request, response) => {
       db.collection('customers').findOne(
         { _id: ObjectId(request.params.customerId) }, 
         { packages: 1 }, (findErr, result) => {
@@ -180,20 +182,6 @@ MongoClient.connect(url, (error, db) => {
       )
     })
 
-    app.get('/getPackageIds/:customerId', (request, response) => {
-      db.collection('customers').findOne(
-        { _id: ObjectId(request.params.customerId) }, 
-        { packages: 1 }, (findErr, result) => {
-          if (findErr) {
-            console.log('/getPackages findErr ', findErr)
-          }
-          else {
-            response.json(result.packages);
-          }
-        }
-      )
-    })
-
     app.get('/getAllPackages', (request, response) => {
       db.collection('packages').find().toArray((readErr, packages) => {
         if (readErr) { 
@@ -214,7 +202,7 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
-    app.get('/removePackageReference/:packageId', (request, response) => {
+    app.post('/removePackageReference/:packageId', (request, response) => {
       const packageId = ObjectId(request.params.packageId);
 
       db.collection('customers').update(
@@ -231,7 +219,7 @@ MongoClient.connect(url, (error, db) => {
       )
     })
 
-    app.get('/removePackage/:packageId', (request, response) => {
+    app.post('/removePackage/:packageId', (request, response) => {
       db.collection('packages').deleteOne({ 
         _id: ObjectId(request.params.packageId) 
       }, (deleteError, result) => {
