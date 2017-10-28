@@ -77,7 +77,7 @@ MongoClient.connect(url, (error, db) => {
             console.log('/bulkRemovePackages findErr ', findErr)
           }
           else {
-            if (result !== null && result.packages.length !== 0) {
+            if (result.packages !== undefined) {
               db.collection('packages').deleteMany({
                 _id: { $in: result.packages }
               }, (deleteErr, deleteResult) => {
@@ -159,7 +159,7 @@ MongoClient.connect(url, (error, db) => {
             console.log('/getPackages findErr ', findErr)
           }
           else {
-            if (result !== null && result.packages.length !== 0) {
+            if (result.packages !== undefined) {
               db.collection('packages').find({
                 _id: { $in: result.packages }
               }).toArray((findPackagesErr, packages) => {

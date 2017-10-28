@@ -41,7 +41,8 @@ window.onload = () => {
 
     /* for customer registration */
     // inserting customer into db
-    document.getElementById('registerCustomerBtn').onclick = () => {
+    document.getElementById('registerCustomerBtn').onclick = (event) => {
+      event.preventDefault()
       const name = document.getElementById('nameInput').value;
       const email = document.getElementById('emailInput').value;
       const password = document.getElementById('passwordInput').value;
@@ -152,7 +153,23 @@ window.onload = () => {
   prepairLinkForSwitchingView(databaseViewLink, databaseView, () => {
     console.log('switched to customers view');
 
-    function loopCustomers(customers, container) {
+    function displayButtons(isModal, data, viewButtonName, delButtonName) {
+      console.log(delButtonName + ' - ' + data._id)
+      if (!isModal) {
+        return `<div class="card-footer text-right">
+          <button type="button" class="btn btn-dark btn-sm ${viewButtonName[0]}" value="${data._id}">${viewButtonName[1]}</button>
+          <button type="button" class="btn btn-dark btn-sm">edit</button>
+          <button toriginype="button" class="btn btn-dark btn-sm ${delButtonName}" value="${data._id}">delete</button>
+        </div>`
+      }
+      else {
+        return '';
+      }
+    }
+
+    function loopCustomers(customers, container, isModal) {
+      container.innerHTML = '';
+
       for (const customer of customers) {
         container.innerHTML += `
           <div class="card border-dark mb-3" style="max-width: 40rem;">
@@ -162,11 +179,7 @@ window.onload = () => {
               <div><i class="fa fa-mobile" aria-hidden="true"></i> ${customer.mobileNumber}</div>
               <div><i class="fa fa-address-book-o" aria-hidden="true"></i> ${customer.address}</div>
             </div>
-            <div class="card-footer text-right">
-              <button type="button" class="btn btn-dark btn-sm packagesButtons" value="${customer._id}">packages</button>
-              <button type="button" class="btn btn-dark btn-sm">edit</button>
-              <button type="button" class="btn btn-dark btn-sm delButtons" value="${customer._id}">delete</button>
-            </div>
+            ${displayButtons(isModal, customer, ['packagesButton', 'packages'], 'delCustomerBtn')}
           </div>
         `;  
       }
@@ -180,7 +193,7 @@ window.onload = () => {
         </div>`
     }
 
-    function displayPackages(whichObject, whichContainer) {
+    function displayPackages(whichObject, whichContainer, isModal) {
       whichContainer.innerHTML = '';
 
       for (const package of whichObject) {
@@ -220,74 +233,29 @@ window.onload = () => {
                 </li>
               </ul>
             </div>
-            <div class="card-footer text-right">
-              <button type="button" class="btn btn-dark btn-sm viewOwnerButtons" value="${package._id}" >view owner</button>
-              <button type="button" class="btn btn-dark btn-sm">edit</button>
-              <button toriginype="button" value="${package._id}" class="btn btn-dark btn-sm removePackageButtons">delete</button>
-            </div>
+            ${displayButtons(isModal, package, ['ownerButton', 'owner'], 'delPackageBtn')}
           </div>
         `;  
       }
     }
 
-    function prepareDelButton(whichNavpill, firstRoute, secondRoute) {
-      const deleteButtons = document.getElementsByClassName('delButtons'); 
+    function prepareBtnForClick(whichNavpill, routes, whichButtons, doWhat) { // do what is a function
+      const buttons = document.getElementsByClassName(whichButtons); 
 
-      if (deleteButtons.length > 0) {
-        for (let i = 0; i < deleteButtons.length; i++) {
-          console.log('here here')
-          deleteButtons[i].onclick = () => {
-            doAjax(`/${firstRoute}/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
-              console.log(`/${firstRoute} delete successful!`)
-            }, 'GET')
-
-            doAjax(`/${secondRoute}/${encodeURIComponent(deleteButtons[i].value)}`, (result) => {
-              console.log(`/${secondRoute} delete successful!`)
-            }, 'GET')
-
+      if (buttons.length > 0) {
+        for (let i = 0; i < buttons.length; i++) {
+          buttons[i].onclick = (event) => {
+            event.preventDefault()
+            for (const route of routes) {
+              console.log(buttons[i].value)
+              doAjax(`/${route}/${encodeURIComponent(buttons[i].value)}`, (result) => {
+                doWhat(result)
+                // console.log(`/${route} successful!`)
+              }, 'GET')
+            }
+            // alert('SUCCESS!')
+            console.log(`${routes} operations successful!`);
             simulatePageRefresh(databaseViewLink, whichNavpill)
-          }
-        }
-      }
-    }
-
-    function preparePackagesBtn() {
-      const packagesButtons = document.getElementsByClassName('packagesButtons'); 
-      const packagesModalContent = document.getElementById('packagesModalContent');
-
-      if (packagesButtons.length > 0) {
-        for (let i = 0; i < packagesButtons.length; i++) {
-          packagesButtons[i].onclick = () => {
-            doAjax(`/getPackagesOfCustomer/${encodeURIComponent(packagesButtons[i].value)}`, (packages) => {
-              console.log(`showing packages...`)
-              console.log(packages.length)
-
-              if (packages.length == undefined) {
-                alert(`This guy ain't got no package!`)
-              }
-              else {
-                displayPackages(packages, packagesModalContent);
-                $('#packagesModal').modal('show')
-              }
-
-            }, 'GET')
-          }
-        }
-      }
-    }
-
-    function prepareViewOwnerBtn() {
-      const viewOwnerButtons = document.getElementsByClassName('viewOwnerButtons'); 
-      const ownerModalContent = document.getElementById('ownerModalContent');
-
-      if (viewOwnerButtons.length > 0) {
-        for (let i = 0; i < viewOwnerButtons.length; i++) {
-          viewOwnerButtons[i].onclick = () => {
-            doAjax(`/getOwnerOfPackage/${encodeURIComponent(viewOwnerButtons[i].value)}`, (packages) => {
-              loopCustomers(packages, ownerModalContent)
-              $('#ownerModal').modal('show')
-              console.log('hah!')
-            }, 'GET')
           }
         }
       }
@@ -299,17 +267,38 @@ window.onload = () => {
       allCustomersContainer.innerHTML = '';
 
       loopCustomers(customers, allCustomersContainer); 
-      prepareDelButton('#allCustomers', 'bulkRemovePackages', 'removeCustomer')
-      preparePackagesBtn()
+      prepareBtnForClick('#allCustomers', ['bulkRemovePackages', 'removeCustomer'], 'delCustomerBtn', () => {
+        console.log('customer deleted')
+      })
+      prepareBtnForClick('#allCustomers', ['getPackagesOfCustomer'], 'packagesButton', (packages) => {
+        console.log(`showing owner...`)
+        console.log(packages)
+
+        if (packages.length == undefined || packages.length == 0) {
+          alert(`This guy ain't got no package!`)
+        }
+        else {
+          displayPackages(packages, packagesModalContent, true);
+          $('#packagesModal').modal('show')
+        }
+      })
     }, 'GET')
 
     // all packages
     doAjax(`/getAllPackages`, (packages) => {
       const packagesContainer = document.getElementById('allPackagesContainer');
 
-      displayPackages(packages, packagesContainer);
-      prepareDelButton('#findCustomer', 'removePackageReference', 'removePackage')
-      prepareViewOwnerBtn()
+      displayPackages(packages, packagesContainer, false);
+      prepareBtnForClick('#allPackages', ['removePackageReference', 'removePackage'], 'delPackageBtn', () => {
+        console.log('package deleted')
+      })
+      prepareBtnForClick('#allPackages', ['getOwnerOfPackage'], 'ownerButton', (owner) => {
+        console.log(`showing packages...`)
+        console.log(owner)
+
+        loopCustomers(owner, ownerModalContent, true)
+        $('#ownerModal').modal('show')
+      })
     }, 'GET')
 
     // find customer
@@ -321,8 +310,21 @@ window.onload = () => {
         findCustomerContainer.innerHTML = '';
 
         loopCustomers(customers, findCustomerContainer)
-        prepareDelButton('#allCustomers', 'bulkRemovePackages', 'removeCustomer')
-        preparePackagesBtn()
+        prepareBtnForClick('#findCustomer', ['bulkRemovePackages', 'removeCustomer'], 'delCustomerBtn', () => {
+          console.log('customer deleted')
+        })
+         prepareBtnForClick('#allCustomers', ['getPackagesOfCustomer'], 'packagesButton', (packages) => {
+          console.log(`showing owner...`)
+          console.log(packages)
+
+          if (packages.length == undefined || packages.length == 0) {
+            alert(`This guy ain't got no package!`)
+          }
+          else {
+            displayPackages(packages, packagesModalContent, true);
+            $('#packagesModal').modal('show')
+          }
+        })
       }, 'GET')
     }
 
@@ -333,9 +335,17 @@ window.onload = () => {
       doAjax(`/findPackage/${encodeURIComponent(findPackageInput.value)}`, (packagesFound) => {
         const packagesFoundContainer = document.getElementById('findPackageContainer'); 
 
-        displayPackages(packagesFound, packagesFoundContainer);
-        prepareDelButton('#findCustomer', 'removePackageReference', 'removePackage')
-        prepareViewOwnerBtn()
+        displayPackages(packagesFound, packagesFoundContainer, false);
+        prepareBtnForClick('#findPackage', ['removePackageReference', 'removePackage'], 'delPackageBtn', () => {
+          console.log('package deleted')
+        })
+        prepareBtnForClick('#allPackages', ['getOwnerOfPackage'], 'ownerButton', (owner) => {
+        console.log(`showing packages...`)
+        console.log(owner)
+
+        loopCustomers(owner, ownerModalContent, true)
+        $('#ownerModal').modal('show')
+      })
       }, 'GET')
     }
   })
