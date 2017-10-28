@@ -103,12 +103,16 @@ window.onload = () => {
     document.getElementById('addAreaBtn').onclick = () => {
       areaAddedCount++;
 
-      document.getElementById('routeInputsContainer').innerHTML += `
+      $(`#routeInputsContainer`).append(`
         <div class="input-group mt-1" id="areaInputGroup${areaAddedCount}">
           <span class="input-group-addon" id="basic-addon3">${areaAddedCount}</span>
           <input type="text" class="form-control" id="areaToPassInput${areaAddedCount}" name="areaToPass" placeholder="where should it pass?">
         </div>
-      `;
+      `);
+
+      // document.getElementById('routeInputsContainer').innerHTML += `
+        
+      // `;
     }
 
     // for removing area input field
