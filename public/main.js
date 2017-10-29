@@ -30,7 +30,7 @@ window.onload = () => {
     $(`#myTab a[href="${whichPillId}"]`).tab('show')
   }
  
-  setContentView(adminLoginView);
+  setContentView(homeView);
 
   prepairLinkForSwitchingView(homeViewLink, homeView, () => {
     console.log('switched to home view');
@@ -98,24 +98,20 @@ window.onload = () => {
     }, 'GET')
     
     // for adding area input field
-    let areaAddedCount = 0; 
-
     document.getElementById('addAreaBtn').onclick = () => {
-      areaAddedCount++;
-
       $(`#routeInputsContainer`).append(`
-        <div class="input-group mt-1" id="areaInputGroup${areaAddedCount}">
-          <span class="input-group-addon" id="basic-addon3">${areaAddedCount}</span>
-          <input type="text" class="form-control" id="areaToPassInput${areaAddedCount}" name="areaToPass" placeholder="where should it pass?">
+        <div class="input-group mt-1 areaInputGroup">
+          <input type="text" class="form-control areaToPassInput" name="areaToPass" placeholder="where should it pass?">
         </div>
       `);
     }
 
     // for removing area input field
     document.getElementById('removeAreaBtn').onclick = () => {
-      if (areaAddedCount !== 0) {
-        $(`#areaInputGroup${areaAddedCount}`).remove();
-        areaAddedCount--; 
+      const areas = document.getElementsByClassName('areaInputGroup'); 
+
+      if (areas.length !== 0) {
+        $(areas[0]).remove();
       }
       else {
         alert('no more area input to remove!');
@@ -124,6 +120,8 @@ window.onload = () => {
 
     // inserting package into db
     document.getElementById('addPackageButton').onclick = () => {
+      const areaInputs = document.getElementsByClassName('areaToPassInput'); 
+
       const customerId = customerInput.value; 
       const origin = originInput.value; 
       const destination = destinationInput.value; 
@@ -135,11 +133,8 @@ window.onload = () => {
       const declaredValue = document.getElementById('declaredValueInput').value; 
       const areasToPassArray = [];
 
-      if (areaAddedCount !== 0) {
-        for (let i = 1; i <= areaAddedCount; i++) {
-          const areaToPassInput = document.getElementById(`areaToPassInput${i}`);
-          areasToPassArray.push(areaToPassInput.value);
-        }
+      for (const areaInput of areaInputs) {
+        areasToPassArray.push(areaInput.value);
       }
 
       const zomeURL = `/createPackage/${encodeURIComponent(customerId)}/${encodeURIComponent(origin)}/${encodeURIComponent(destination)}/${encodeURIComponent(areasToPassArray)}/${encodeURIComponent(distanceInKm)}/${encodeURIComponent(currentLocation)}/${encodeURIComponent(status)}/${encodeURIComponent(paymode)}/${encodeURIComponent(boxSize)}/${encodeURIComponent(declaredValue)}`;
@@ -318,23 +313,6 @@ window.onload = () => {
     function updateCustomer() {
 
     }
-
-    // function activateEditCustomerModal(modalId, data) {
-    //   const datum = data[0];
-
-    //   alert('i reached here')
-    //   ${}
-
-    //   console.log(modalContainer)
-
-    //   modalContainer.innerHTML = `
-    //     
-    //   `;
-
-    //   $('#editCustomerModal').modal('show')
-
-    //   // 
-    // }
 
     function readyCustomerOperations(customers, whichContainer, whichNavpill) {
       whichContainer.innerHTML = '';
