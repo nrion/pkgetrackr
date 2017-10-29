@@ -36,12 +36,8 @@ window.onload = () => {
     console.log('switched to home view');
   });
 
-  prepairLinkForSwitchingView(registrationViewLink, registrationView, () => {
-    console.log('switched to registration view');
-
-    /* for customer registration */
-    // inserting customer into db
-    document.getElementById('registerCustomerBtn').onclick = (event) => {
+  function upsertCustomer(button, url, viewLink, navpill, performTask) { // display is an array, performTask is a callback
+    document.getElementById(button).onclick = (event) => {
       event.preventDefault()
       const name = document.getElementById('nameInput').value;
       const email = document.getElementById('emailInput').value;
@@ -49,12 +45,23 @@ window.onload = () => {
       const mobileNumber = document.getElementById('mobileNumberInput').value;
       const address = document.getElementById('addressInput').value;
   
-      const createCustomerUrl = `/createCustomer/${encodeURIComponent(name)}/${encodeURIComponent(email)}/${encodeURIComponent(password)}/${encodeURIComponent(mobileNumber)}/${encodeURIComponent(address)}`;
-      doAjax(createCustomerUrl, (result) => { 
-        alert(`ADDED SUCCESSFULY!`); 
-        simulatePageRefresh(registrationViewLink, '#customerRegistration') 
+      const upsertUrl = `/${url}/${encodeURIComponent(name)}/${encodeURIComponent(email)}/${encodeURIComponent(password)}/${encodeURIComponent(mobileNumber)}/${encodeURIComponent(address)}`;
+      doAjax(upsertUrl, (result) => { 
+        performTask(); 
+        simulatePageRefresh(viewLink, `#${navpill}`) 
       }, 'POST');
     }
+  }
+
+  prepairLinkForSwitchingView(registrationViewLink, registrationView, () => {
+    console.log('switched to registration view');
+
+    /* for customer registration */
+    // inserting customer into db
+    upsertCustomer('registerCustomerBtn', 'createCustomer', 
+      registrationViewLink, 'customerRegistration', () => {
+        alert('CUSTOMER ADDED!')
+    })
 
     /* for package registration */
     const customerInput = document.getElementById('customerInput');
@@ -310,10 +317,6 @@ window.onload = () => {
       `;
     }
 
-    function updateCustomer() {
-
-    }
-
     function readyCustomerOperations(customers, whichContainer, whichNavpill) {
       whichContainer.innerHTML = '';
       loopData(customers, whichContainer, displayCustomer); 
@@ -330,22 +333,12 @@ window.onload = () => {
           setupModal('edit customer', () => {
             return fillEditCustomerModal(customer[0])
           })
-
-          document.getElementById('updateCustomerBtn').onclick = () => {
-            const name = document.getElementById('nameInput').value;
-            const email = document.getElementById('emailInput').value;
-            const password = document.getElementById('passwordInput').value;
-            const mobileNumber = document.getElementById('mobileNumberInput').value;
-            const address = document.getElementById('addressInput').value;
-
-            const updateCustomerUrl = `/updateCustomer/${customer[0]._id}/${encodeURIComponent(name)}/${encodeURIComponent(email)}/${encodeURIComponent(password)}/${encodeURIComponent(mobileNumber)}/${encodeURIComponent(address)}`;
-            doAjax(updateCustomerUrl, (result) => {
-              console.log(result)
-              alert('SUCESSFULLY UPDATED')
+          // put here
+          upsertCustomer('updateCustomerBtn', `updateCustomer/${customer[0]._id}`, 
+            databaseViewLink, `${whichNavpill}`, () => {
               $('#universalModal').modal('hide')
-              simulatePageRefresh(databaseViewLink, `${whichNavpill}`)
-            }, 'POST')
-          }
+              alert('CUSTOMER UPDATED!')
+          })
       })
 
       // view packages button
