@@ -118,7 +118,7 @@ window.onload = () => {
       const areas = document.getElementsByClassName('areaInputGroup'); 
 
       if (areas.length !== 0) {
-        $(areas[0]).remove();
+        $(areas[areas.length - 1]).remove();
       }
       else {
         alert('no more area input to remove!');
