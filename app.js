@@ -19,8 +19,9 @@ MongoClient.connect(url, (error, db) => {
   else { 
     console.log('db created!');
     
-    const createCustomerUrl = `/createCustomer/:name/:email/:password/:mobileNumber/:address`
-    app.post(createCustomerUrl, (request, response) => {
+    const customerUrl = `/:name/:email/:password/:mobileNumber/:address`
+    
+    app.post(`/createCustomer${customerUrl}`, (request, response) => {
       db.collection('customers').insertOne({
         name: request.params.name, 
         email: request.params.email, 
@@ -36,7 +37,35 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
-    // app.post()
+    app.post(`/updateCustomer/:customerId${customerUrl}`, (request, response) => {
+      db.collection('customers').update(
+        { _id: ObjectId(request.params.customerId) },
+        { $set: { 
+          name: request.params.name, 
+          email: request.params.email, 
+          password: request.params.password, 
+          mobileNumber: request.params.mobileNumber, 
+          address: request.params.address
+         }
+        }, (updateErr, result) => {
+          if (updateErr) {
+            console.log('/updateCustomer err ', updateErr)
+          }
+          response.json(result)
+        }
+      )
+    })
+
+    app.get('/getCustomerById/:customerId', (request, response) => {
+      db.collection('customers').find({ 
+        _id: ObjectId(request.params.customerId) 
+      }).toArray((readErr, result) => {
+        if (readErr) {
+          console.log('/getCustmerById err ', readErr)
+        }
+        response.json(result)
+      })
+    })
 
     app.get('/getCustomers', (request, response) => {
       db.collection('customers').find().toArray((readErr, customers) => {
@@ -147,9 +176,7 @@ MongoClient.connect(url, (error, db) => {
         if (readErr) {
           console.log('/getOwnerOfPackage err ', readerr)
         }
-        else {
-          response.json(result);
-        }
+        response.json(result);
       })
     })
 
@@ -212,9 +239,7 @@ MongoClient.connect(url, (error, db) => {
           if (updateErr) {
             console.log('/removePackageReference failed ', updateErr)
           }
-          else {
-            response.json(result)
-          }
+          response.json(result)
         }
       )
     })
@@ -232,8 +257,10 @@ MongoClient.connect(url, (error, db) => {
 
     app.get('/getCoveredAreas', (request, response) => {
       db.collection('coveredAreas').find().toArray((readErr, areas) => {
-        if (readErr) { console.log('error retrieving covered areas ', readErr) }
-        else { response.json(areas) }
+        if (readErr) { 
+          console.log('error retrieving covered areas ', readErr) 
+        }
+        response.json(areas)
       })
     })
     

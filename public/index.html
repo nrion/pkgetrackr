@@ -53,11 +53,11 @@
           <form action="/readAdmin">
             <div class="form-group">
               <label for="usernameInput">username</label>
-              <input type="username" class="form-control" id="usernameInput" placeholder="username">
+              <input type="username" class="form-control" id="usernameInput" placeholder="enter username">
             </div>
             <div class="form-group">
               <label for="passwordInput">password</label>
-              <input type="password" class="form-control" id="passwordInput" placeholder="password">
+              <input type="password" class="form-control" id="passwordInput" placeholder="enter password">
             </div>
             <button type="submit" class="btn btn-dark">sign in</button>
             <hr>
@@ -223,6 +223,65 @@
     <!-- database view -->
     <template id="databaseView">
       <div class="container mt-3">
+        <div id="modalDiv">
+          <div class="modal fade" id="universalModal" tabindex="-1" role="dialog" aria-labelledby="universalModal" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content" id="universalModalContainer">
+                    <!-- <div class="modal-header">
+                      <h5 class="modal-title" id="packagesModalLabel">packages</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                    </div> -->
+                  </div>
+                </div>
+              </div>
+          <!-- <div class="modal fade" id="packagesModal" tabindex="-1" role="dialog" aria-labelledby="packagesModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content" >
+                <div class="modal-header">
+                  <h5 class="modal-title" id="packagesModalLabel">packages</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body" id="packagesModalContent">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal fade" id="editCustomerModal" tabindex="-1" role="dialog" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content" >
+                <div class="modal-header">
+                  <h5 class="modal-title" id="editCustomerModalLabel">edit customer</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body" id="editCustomerModalContent">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal fade" id="ownerModal" tabindex="-1" role="dialog" aria-labelledby="ownerModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content" >
+                <div class="modal-header">
+                  <h5 class="modal-title" id="ownerModalLabel">owner description</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body" id="ownerModalContent">
+                </div>
+              </div>
+            </div>
+          </div> -->
+        </div>
+
         <!-- database view nav -->
         <ul class="nav nav-tabs" id="myTab" role="tablist">
           <li class="nav-item">
@@ -250,21 +309,7 @@
               <div class="card-columns" id="allCustomersContainer">
                 <!-- do ajax here -->
               </div>
-              <div class="modal fade" id="packagesModal" tabindex="-1" role="dialog" aria-labelledby="packagesModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content" >
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="packagesModalLabel">packages</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body" id="packagesModalContent">
-                      <!-- ... -->
-                    </div>
-                  </div>
-                </div>
-              </div>
+              
             </main>
           </div>
           <!-- end of all customers -->
@@ -277,21 +322,7 @@
               <div class="card-columns" id="allPackagesContainer">
                 <!-- do ajax here -->
               </div>
-              <div class="modal fade" id="ownerModal" tabindex="-1" role="dialog" aria-labelledby="ownerModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content" >
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="ownerModalLabel">owner description</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body" id="ownerModalContent">
-                      <!-- ... -->
-                    </div>
-                  </div>
-                </div>
-              </div>
+              
             </main>
           </div>
           <!-- end of all packages -->
