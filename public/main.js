@@ -53,6 +53,74 @@ window.onload = () => {
     }
   }
 
+  function upsertPackage(button, url, viewLink, navpill, performTask) {
+    document.getElementById(button).onclick = () => {
+      const areaInputs = document.getElementsByClassName('areaToPassInput'); 
+
+      const customerId = customerInput.value; 
+      const origin = originInput.value; 
+      const destination = destinationInput.value; 
+      const distanceInKm = document.getElementById('distanceInKmInput').value;
+      const currentLocation = document.getElementById('currentLocationInput').value; 
+      const status = document.getElementById('statusInput').value; 
+      const paymode = document.getElementById('paymodeInput').value; 
+      const boxSize = document.getElementById('boxSizeInput').value; 
+      const declaredValue = document.getElementById('declaredValueInput').value; 
+      const areasToPassArray = [];
+
+      for (const areaInput of areaInputs) {
+        areasToPassArray.push(areaInput.value);
+      }
+
+      const upsertUrl = `/${url}/${encodeURIComponent(customerId)}/${encodeURIComponent(origin)}/${encodeURIComponent(destination)}/${encodeURIComponent(areasToPassArray)}/${encodeURIComponent(distanceInKm)}/${encodeURIComponent(currentLocation)}/${encodeURIComponent(status)}/${encodeURIComponent(paymode)}/${encodeURIComponent(boxSize)}/${encodeURIComponent(declaredValue)}`;
+      doAjax(upsertUrl, (result) => { 
+        performTask();
+        // alert(`PACKAGE ADDED SUCCESSFULLY!`) 
+        simulatePageRefresh(viewLink, `#${navpill}`) 
+      }, 'POST');
+    }
+  }
+
+  // for origin & destination dropdowns
+  function fillAreasDropdown() {
+    doAjax('/getCoveredAreas', (areas) => {
+      originInput.innerHTML = '';
+      destinationInput.innerHTML = '';
+
+      for (const area of areas) {
+        const optionTag = `<option value="${area.address}">${area.address}</option>`;
+
+        originInput.innerHTML += optionTag; 
+        destinationInput.innerHTML += optionTag; 
+      }
+    }, 'GET')
+  }
+
+  // for adding area input field
+  function addRouteButton() {
+    document.getElementById('addAreaBtn').onclick = () => {
+      $(`#routeInputsContainer`).append(`
+        <div class="input-group mt-1 areaInputGroup">
+          <input type="text" class="form-control areaToPassInput" name="areaToPass" placeholder="where should it pass?">
+        </div>
+      `);
+    }
+  }
+
+  // for removing area input field
+  function removeRouteButton() {
+    document.getElementById('removeAreaBtn').onclick = () => {
+      const areas = document.getElementsByClassName('areaInputGroup'); 
+
+      if (areas.length !== 0) {
+        $(areas[0]).remove();
+      }
+      else {
+        alert('no more area input to remove!');
+      }
+    }
+  }
+
   prepairLinkForSwitchingView(registrationViewLink, registrationView, () => {
     console.log('switched to registration view');
 
@@ -65,8 +133,8 @@ window.onload = () => {
 
     /* for package registration */
     const customerInput = document.getElementById('customerInput');
-    const originInput = document.getElementById('originInput');
     const destinationInput = document.getElementById('destinationInput');
+    const originInput = document.getElementById('originInput');
     
     // for customers dropdown
     doAjax('/getCustomers', (customers) => {
@@ -91,65 +159,16 @@ window.onload = () => {
       }, 'GET');
     }
 
-    // for origin & destination dropdowns
-    doAjax('/getCoveredAreas', (areas) => {
-      originInput.innerHTML = '';
-      destinationInput.innerHTML = '';
-
-      for (const area of areas) {
-        const optionTag = `<option value="${area.address}">${area.address}</option>`;
-
-        originInput.innerHTML += optionTag; 
-        destinationInput.innerHTML += optionTag; 
-      }
-    }, 'GET')
-    
-    // for adding area input field
-    document.getElementById('addAreaBtn').onclick = () => {
-      $(`#routeInputsContainer`).append(`
-        <div class="input-group mt-1 areaInputGroup">
-          <input type="text" class="form-control areaToPassInput" name="areaToPass" placeholder="where should it pass?">
-        </div>
-      `);
-    }
-
-    // for removing area input field
-    document.getElementById('removeAreaBtn').onclick = () => {
-      const areas = document.getElementsByClassName('areaInputGroup'); 
-
-      if (areas.length !== 0) {
-        $(areas[0]).remove();
-      }
-      else {
-        alert('no more area input to remove!');
-      }
-    }
+    fillAreasDropdown(); 
+    addRouteButton(); 
+    removeRouteButton(); 
 
     // inserting package into db
-    document.getElementById('addPackageButton').onclick = () => {
-      const areaInputs = document.getElementsByClassName('areaToPassInput'); 
+    upsertPackage('addPackageButton', 'createPackage', 
+      registrationViewLink, 'packageRegistration', () => {
+        alert('PACKAGE ADDED!')
+    })
 
-      const customerId = customerInput.value; 
-      const origin = originInput.value; 
-      const destination = destinationInput.value; 
-      const distanceInKm = document.getElementById('distanceInKmInput').value;
-      const currentLocation = document.getElementById('currentLocationInput').value; 
-      const status = document.getElementById('statusInput').value; 
-      const paymode = document.getElementById('paymodeInput').value; 
-      const boxSize = document.getElementById('boxSizeInput').value; 
-      const declaredValue = document.getElementById('declaredValueInput').value; 
-      const areasToPassArray = [];
-
-      for (const areaInput of areaInputs) {
-        areasToPassArray.push(areaInput.value);
-      }
-
-      const zomeURL = `/createPackage/${encodeURIComponent(customerId)}/${encodeURIComponent(origin)}/${encodeURIComponent(destination)}/${encodeURIComponent(areasToPassArray)}/${encodeURIComponent(distanceInKm)}/${encodeURIComponent(currentLocation)}/${encodeURIComponent(status)}/${encodeURIComponent(paymode)}/${encodeURIComponent(boxSize)}/${encodeURIComponent(declaredValue)}`;
-      doAjax(zomeURL, (result) => { 
-        alert(`PACKAGE ADDED SUCCESSFULLY!`) 
-        simulatePageRefresh(databaseViewLink, '#packageRegistration') 
-      }, 'POST');
-    }
   });
 
   prepairLinkForSwitchingView(databaseViewLink, databaseView, () => {
