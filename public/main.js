@@ -289,6 +289,36 @@ window.onload = () => {
       }
     }
 
+    function fillEditCustomerModal(data) {
+      return `
+        <div class="form-group">
+          <label for="nameInput">name</label>
+          <input type="text" class="form-control" id="nameInput" value="${data.name}" name="name" placeholder="full name">
+        </div>
+        <div class="form-group">
+          <label for="emailInput">email</label>
+          <input type="email" class="form-control" id="emailInput" value="${data.email}" name="email" placeholder="email">
+        </div>
+        <div class="form-group">
+          <label for="passwordInput">password</label>
+          <input type="password" class="form-control" id="passwordInput" value="${data.password}" name="password" placeholder="choose a password">
+        </div>
+        <div class="form-group">
+          <label for="mobileNumberInput">mobile number</label>
+          <input type="number" class="form-control" id="mobileNumberInput" value="${data.mobileNumber}" name="mobileNumber" placeholder="mobile number">
+        </div>
+        <div class="form-group">
+          <label for="addressInput">address</label>
+          <textarea rows="2" class="form-control" id="addressInput" name="address" placeholder="address">${data.address}</textarea>
+        </div>
+        <button id="updateCustomerBtn" class="btn btn-outline-dark">save edit</button>
+      `;
+    }
+
+    function updateCustomer() {
+
+    }
+
     // function activateEditCustomerModal(modalId, data) {
     //   const datum = data[0];
 
@@ -303,21 +333,7 @@ window.onload = () => {
 
     //   $('#editCustomerModal').modal('show')
 
-    //   // document.getElementById('updateCustomerBtn').onclick = () => {
-    //   //   const name = document.getElementById('nameInput').value;
-    //   //   const email = document.getElementById('emailInput').value;
-    //   //   const password = document.getElementById('passwordInput').value;
-    //   //   const mobileNumber = document.getElementById('mobileNumberInput').value;
-    //   //   const address = document.getElementById('addressInput').value;
-
-    //   //   const updateCustomerUrl = `/updateCustomer/${customer._id}/${encodeURIComponent(name)}/${encodeURIComponent(email)}/${encodeURIComponent(password)}/${encodeURIComponent(mobileNumber)}/${encodeURIComponent(address)}`;
-    //   //   doAjax(updateCustomerUrl, (result) => {
-    //   //     console.log(result)
-    //   //     alert('SUCESSFULLY UPDATED')
-    //   //     $('#editCustomerModal').modal('hide')
-    //   //     simulatePageRefresh(databaseViewLink, 'allCustomers')
-    //   //   }, 'POST')
-    //   // }
+    //   // 
     // }
 
     function readyCustomerOperations(customers, whichContainer, whichNavpill) {
@@ -330,14 +346,28 @@ window.onload = () => {
           console.log('customer deleted')
       })
 
+      // edit button
       prepareBtnForClick(`#${whichNavpill}`, 
         ['getCustomerById'], 'editCustomerBtn', 'GET', (customer) => {
-          console.log(document.getElementById('universalModalContainer'))
-          $('#universalModalContainer').html(() => {
-            alert('this is weird')
-            return 'fuck you'
+          setupModal('edit customer', () => {
+            return fillEditCustomerModal(customer[0])
           })
-          $('#universalModal').modal('show')
+
+          document.getElementById('updateCustomerBtn').onclick = () => {
+            const name = document.getElementById('nameInput').value;
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            const mobileNumber = document.getElementById('mobileNumberInput').value;
+            const address = document.getElementById('addressInput').value;
+
+            const updateCustomerUrl = `/updateCustomer/${customer[0]._id}/${encodeURIComponent(name)}/${encodeURIComponent(email)}/${encodeURIComponent(password)}/${encodeURIComponent(mobileNumber)}/${encodeURIComponent(address)}`;
+            doAjax(updateCustomerUrl, (result) => {
+              console.log(result)
+              alert('SUCESSFULLY UPDATED')
+              $('#universalModal').modal('hide')
+              simulatePageRefresh(databaseViewLink, `${whichNavpill}`)
+            }, 'POST')
+          }
       })
 
       // view packages button
