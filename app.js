@@ -181,6 +181,10 @@ MongoClient.connect(url, (error, db) => {
     });
 
     app.post(`/updatePackage/:packageId${packageUrl}`, (request, response) => {
+      const routes = request.params.areasToPass; 
+      const areasToPassArray = routes.split(',');
+      const computedPrice = computePrice(request.params.distanceInKm, request.params.boxSize);
+      
       db.collection('packages').update(
         { _id: ObjectId(request.params.packageId) },
         { $set: { 

@@ -36,7 +36,7 @@ window.onload = () => {
     console.log('switched to home view');
   });
 
-  function upsertCustomer(button, url, viewLink, navpill, performTask) { // display is an array, performTask is a callback
+  function upsertCustomer(button, url, viewLink, navpill, performTask) {
     document.getElementById(button).onclick = (event) => {
       event.preventDefault()
       const name = document.getElementById('nameInput').value;
@@ -57,7 +57,6 @@ window.onload = () => {
     document.getElementById(button).onclick = () => {
       const areaInputs = document.getElementsByClassName('areaToPassInput'); 
 
-      const customerId = document.getElementById('customerInput').value; 
       const origin = document.getElementById('originInput').value; 
       const destination = document.getElementById('destinationInput').value; 
       const distanceInKm = document.getElementById('distanceInKmInput').value;
@@ -72,7 +71,7 @@ window.onload = () => {
         areasToPassArray.push(areaInput.value);
       }
 
-      const upsertUrl = `/${url}/${encodeURIComponent(customerId)}/${encodeURIComponent(origin)}/${encodeURIComponent(destination)}/${encodeURIComponent(areasToPassArray)}/${encodeURIComponent(distanceInKm)}/${encodeURIComponent(currentLocation)}/${encodeURIComponent(status)}/${encodeURIComponent(paymode)}/${encodeURIComponent(boxSize)}/${encodeURIComponent(declaredValue)}`;
+      const upsertUrl = `/${url}/${encodeURIComponent(origin)}/${encodeURIComponent(destination)}/${encodeURIComponent(areasToPassArray)}/${encodeURIComponent(distanceInKm)}/${encodeURIComponent(currentLocation)}/${encodeURIComponent(status)}/${encodeURIComponent(paymode)}/${encodeURIComponent(boxSize)}/${encodeURIComponent(declaredValue)}`;
       doAjax(upsertUrl, (result) => { 
         performTask();
         // alert(`PACKAGE ADDED SUCCESSFULLY!`) 
@@ -82,7 +81,7 @@ window.onload = () => {
   }
 
   // for origin & destination dropdowns
-  function fillAreasDropdown() {
+  function fillAreasDropdown(ondone) {
     const destinationInput = document.getElementById('destinationInput');
     const originInput = document.getElementById('originInput');
     
@@ -96,12 +95,15 @@ window.onload = () => {
         originInput.innerHTML += optionTag; 
         destinationInput.innerHTML += optionTag; 
       }
+
+      if (ondone) { ondone() }
     }, 'GET')
   }
 
   // for adding area input field
   function addRouteButton() {
     document.getElementById('addAreaBtn').onclick = () => {
+      console.log('clicked')
       $(`#routeInputsContainer`).append(`
         <div class="input-group mt-1 areaInputGroup">
           <input type="text" class="form-control areaToPassInput" name="areaToPass" placeholder="where should it pass?">
@@ -166,7 +168,9 @@ window.onload = () => {
     removeRouteButton(); 
 
     // inserting package into db
-    upsertPackage('addPackageButton', 'createPackage', 
+    const customerId = document.getElementById('customerInput').value; 
+    
+    upsertPackage('addPackageButton', `createPackage/${customerId}`, 
       registrationViewLink, 'packageRegistration', () => {
         alert('PACKAGE ADDED!')
     })
@@ -289,6 +293,8 @@ window.onload = () => {
         </div>
       `;
 
+      // if (performAnother) { performAnother() }
+
       $('#universalModal').modal('show')
     }
     
@@ -340,6 +346,7 @@ window.onload = () => {
 
     function fillEditPackageModal(data) {
       return `
+        <input type="hidden" id="customerInput" value="${data.customerId}">
         <div class="form-group">
           <label for="originInput">origin</label>
           <select id="originInput" class="form-control" name="origin">
@@ -455,9 +462,30 @@ window.onload = () => {
             return fillEditPackageModal(package[0])
           })
 
-          fillAreasDropdown(); 
+          fillAreasDropdown(() => {
+            document.getElementById('originInput').value = package[0].origin;
+            document.getElementById('destinationInput').value = package[0].destination;
+          }); 
+
           addRouteButton(); 
           removeRouteButton(); 
+
+          const addAreaBtn = document.getElementById('addAreaBtn'); 
+          for (const area of package[0].areasToPass) {
+            addAreaBtn.click(); 
+          }
+
+          const areas = document.getElementsByClassName('areaToPassInput'); 
+          for (let i = 0; i < package[0].areasToPass.length; i++) {
+            console.log(areas[i].value)
+            console.log(package[0].areasToPass[i])
+
+            areas[i].value = package[0].areasToPass[i]; 
+          }
+
+          document.getElementById('statusInput').value = package[0].status;
+          document.getElementById('paymodeInput').value = package[0].paymode;
+          document.getElementById('boxSizeInput').value = package[0].boxSize;
 
           upsertPackage('updatePackageBtn', `updatePackage/${package[0]._id}`, 
             databaseViewLink, `${whichNavpill}`, () => {
