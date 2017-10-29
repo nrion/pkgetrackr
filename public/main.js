@@ -57,9 +57,9 @@ window.onload = () => {
     document.getElementById(button).onclick = () => {
       const areaInputs = document.getElementsByClassName('areaToPassInput'); 
 
-      const customerId = customerInput.value; 
-      const origin = originInput.value; 
-      const destination = destinationInput.value; 
+      const customerId = document.getElementById('customerInput').value; 
+      const origin = document.getElementById('originInput').value; 
+      const destination = document.getElementById('destinationInput').value; 
       const distanceInKm = document.getElementById('distanceInKmInput').value;
       const currentLocation = document.getElementById('currentLocationInput').value; 
       const status = document.getElementById('statusInput').value; 
@@ -83,6 +83,9 @@ window.onload = () => {
 
   // for origin & destination dropdowns
   function fillAreasDropdown() {
+    const destinationInput = document.getElementById('destinationInput');
+    const originInput = document.getElementById('originInput');
+    
     doAjax('/getCoveredAreas', (areas) => {
       originInput.innerHTML = '';
       destinationInput.innerHTML = '';
@@ -133,8 +136,7 @@ window.onload = () => {
 
     /* for package registration */
     const customerInput = document.getElementById('customerInput');
-    const destinationInput = document.getElementById('destinationInput');
-    const originInput = document.getElementById('originInput');
+    
     
     // for customers dropdown
     doAjax('/getCustomers', (customers) => {
@@ -336,6 +338,68 @@ window.onload = () => {
       `;
     }
 
+    function fillEditPackageModal(data) {
+      return `
+        <div class="form-group">
+          <label for="originInput">origin</label>
+          <select id="originInput" class="form-control" name="origin">
+            <!-- doAjax here -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="destinationInput">destination</label>
+          <select id="destinationInput" class="form-control" name="destination">
+            <!-- doAjax here -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label>areas to pass</label>
+          <button type="button" id="addAreaBtn" class="btn btn-light btn-sm"><i class="fa fa-plus" aria-hidden="true"></i> add</button>
+          <button type="button" id="removeAreaBtn" class="btn btn-light btn-sm"><i class="fa fa-minus" aria-hidden="true"></i> remove</button>
+          <div id="routeInputsContainer">
+            <!-- put something here from js -->
+          </div>
+        </div> 
+        <div class="form-group">
+          <label for="distanceInKmInput">distance</label>
+          <input value="${data.distanceInKm}" type="number" min="1" max="18" class="form-control" id="distanceInKmInput" name="distanceInKm" placeholder="how far is it? (in km)">
+        </div>
+        <div class="form-group">
+          <label for="currentLocationInput">current location</label>
+          <input value="${data.currentLocation}" type="text" class="form-control" id="currentLocationInput" name="currentLocation" placeholder="where is it right now?">
+        </div>
+        <div class="form-group">
+          <label for="declaredValueInput">declared value</label>
+          <input value="${data.declaredValue}" type="number" min="1" class="form-control" id="declaredValueInput" name="declaredValue" placeholder="how much is it worth?">
+        </div>
+        <div class="form-group">
+          <label for="statusInput">status</label>
+          <select id="statusInput" class="form-control" name="status">
+            <option value="pending">pending</option>
+            <option value="moving">moving</option>
+            <option value="arrived">arrived</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="paymodeInput">paymode</label>
+          <select id="paymodeInput" class="form-control" name="paymode">
+            <option value="prepaid">prepaid</option>
+            <option value="freight collect">freight collect</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="boxSizeInput">box size</label>
+          <select id="boxSizeInput" class="form-control" name="boxSize">
+            <option value="extra small">extra small</option>
+            <option value="small">small</option>
+            <option value="medium">medium</option>
+            <option value="large">large</option>
+          </select>
+        </div>
+        <button id="updatePackageBtn" type="submit" class="btn btn-outline-dark">update package</button>
+      `;
+    }
+
     function readyCustomerOperations(customers, whichContainer, whichNavpill) {
       whichContainer.innerHTML = '';
       loopData(customers, whichContainer, displayCustomer); 
@@ -382,6 +446,24 @@ window.onload = () => {
       // delete button
       prepareBtnForClick(`#${whichNavpill}`, ['removePackageReference', 'removePackage'], 'delPackageBtn', 'POST', () => {
         console.log('package deleted')
+      })
+
+      // edit button
+      prepareBtnForClick(`#${whichNavpill}`, 
+        ['getPackageById'], 'editPackageBtn', 'GET', (package) => {
+          setupModal('edit package', () => {
+            return fillEditPackageModal(package[0])
+          })
+
+          fillAreasDropdown(); 
+          addRouteButton(); 
+          removeRouteButton(); 
+
+          upsertPackage('updatePackageBtn', `updatePackage/${package[0]._id}`, 
+            databaseViewLink, `${whichNavpill}`, () => {
+              $('#universalModal').modal('hide')
+              alert('PACKAGE UPDATED!')
+          })
       })
 
       // view owner button
@@ -432,4 +514,3 @@ window.onload = () => {
     }
   })
 }
- 

@@ -67,6 +67,17 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
+    app.get('/getPackageById/:packageId', (request, response) => {
+      db.collection('packages').find({ 
+        _id: ObjectId(request.params.packageId) 
+      }).toArray((readErr, result) => {
+        if (readErr) {
+          console.log('/getPackageById err ', readErr)
+        }
+        response.json(result)
+      })
+    })
+
     app.get('/getCustomers', (request, response) => {
       db.collection('customers').find().toArray((readErr, customers) => {
         if (readErr) { 
@@ -128,10 +139,10 @@ MongoClient.connect(url, (error, db) => {
       )
     })
 
-    const createPackageUrl = '/createPackage/:customerId/:origin/:destination/:areasToPass' 
+    const packageUrl = '/:origin/:destination/:areasToPass' 
       + '/:distanceInKm/:currentLocation/:status/:paymode/:boxSize/:declaredValue';
     
-      app.post(createPackageUrl, (request, response) => {
+    app.post(`/createPackage/:customerId${packageUrl}`, (request, response) => {
       const routes = request.params.areasToPass; 
       const areasToPassArray = routes.split(',');
       const computedPrice = computePrice(request.params.distanceInKm, request.params.boxSize);
@@ -168,6 +179,30 @@ MongoClient.connect(url, (error, db) => {
         }
       })
     });
+
+    app.post(`/updatePackage/:packageId${packageUrl}`, (request, response) => {
+      db.collection('packages').update(
+        { _id: ObjectId(request.params.packageId) },
+        { $set: { 
+          origin: request.params.origin, 
+          destination: request.params.destination, 
+          areasToPass: areasToPassArray, 
+          distanceInKm: request.params.distanceInKm,
+          currentLocation: request.params.currentLocation, 
+          status: request.params.status,
+          paymode: request.params.paymode,
+          boxSize: request.params.boxSize, 
+          declaredValue: request.params.declaredValue,
+          price: computedPrice
+         }
+        }, (updateErr, result) => {
+          if (updateErr) {
+            console.log('/updatePackage err ', updateErr)
+          }
+          response.json(result)
+        }
+      )
+    })
 
     app.get('/getOwnerOfPackage/:packageId', (request, response) => {
       db.collection('customers').find({
