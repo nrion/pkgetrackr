@@ -1,4 +1,4 @@
-function doAjax(url, command, method) {
+function doAjax(url, command, method, extraMethods) {
   const xhr = new XMLHttpRequest(); 
   
   xhr.onreadystatechange = () => {
@@ -8,5 +8,6 @@ function doAjax(url, command, method) {
   }
 
   xhr.open(method, url, true);
-  xhr.send();
+  if (extraMethods) { extraMethods(xhr); }
+  // xhr.send();
 }

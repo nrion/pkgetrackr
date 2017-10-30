@@ -10,7 +10,7 @@
   </head>
   <body>
     <!-- nav bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" id="theNavbar">
       <div class="container">
         <a class="navbar-brand" href="#"><i class="fa fa-archive" aria-hidden="true"></i> pkgetrackr</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -50,7 +50,7 @@
           <h4>hello, <i class="fa fa-archive" aria-hidden="true"></i> <b>pkgetrackr</b> admin!</h4>
           <p style="font-size: 1rem">sign in to manage customers & their packages</p>
           <hr>
-          <form action="/readAdmin">
+          <!-- <form action="/readAdmin"> -->
             <div class="form-group">
               <label for="usernameInput">username</label>
               <input type="username" class="form-control" id="usernameInput" placeholder="enter username">
@@ -59,10 +59,10 @@
               <label for="passwordInput">password</label>
               <input type="password" class="form-control" id="passwordInput" placeholder="enter password">
             </div>
-            <button type="submit" class="btn btn-dark">sign in</button>
+            <button type="submit" id="signinBtn" class="btn btn-dark">sign in</button>
             <hr>
              <!-- <span>unregistered? <a href="#" id="signupLink">sign up</a></span>  -->
-          </form>
+          <!-- </form> -->
         </div>
       </main>
     </template>
@@ -108,11 +108,11 @@
                 <!-- <form id="registrationForm" action="/createCustomer" method="POST"> -->
                 <div class="form-group">
                   <label for="nameInput">name</label>
-                  <input type="text" class="form-control" id="nameInput" name="name" placeholder="full name">
+                  <input required type="text" class="form-control" id="nameInput" name="name" placeholder="full name">
                 </div>
                 <div class="form-group">
                   <label for="emailInput">email</label>
-                  <input type="email" class="form-control" id="emailInput" name="email" placeholder="email">
+                  <input required type="email" class="form-control" id="emailInput" name="email" placeholder="email">
                 </div>
                 <div class="form-group">
                   <label for="passwordInput">password</label>
@@ -120,11 +120,11 @@
                 </div>
                 <div class="form-group">
                   <label for="mobileNumberInput">mobile number</label>
-                  <input type="number" class="form-control" id="mobileNumberInput" name="mobileNumber" placeholder="mobile number">
+                  <input required type="number" class="form-control" id="mobileNumberInput" name="mobileNumber" placeholder="mobile number">
                 </div>
                 <div class="form-group">
                   <label for="addressInput">address</label>
-                  <textarea rows="2" class="form-control" id="addressInput" name="address" placeholder="address"></textarea>
+                  <textarea required rows="2" class="form-control" id="addressInput" name="address" placeholder="address"></textarea>
                 </div>
                 <button id="registerCustomerBtn" class="btn btn-outline-dark">register</button>
                 <!-- </form> -->

@@ -12,6 +12,30 @@ window.onload = () => {
   const registrationView = document.getElementById('registrationView');
   const databaseView = document.getElementById('databaseView');
 
+  setContentView(adminLoginView)
+  document.getElementById('theNavbar').style.display = 'none';
+
+  document.getElementById('signinBtn').onclick = () => {
+    const usernameInput = document.getElementById('usernameInput').value;
+    const passwordInput = document.getElementById('passwordInput').value;
+
+    console.log(usernameInput)
+    console.log(passwordInput)
+  
+    doAjax('/login', (result) => {
+      if (!result.isFailure) {
+        document.getElementById('theNavbar').style.display = 'block';
+        setContentView(homeView)
+      }
+      else {
+        alert('admin not found')
+      }
+    }, 'POST', (xhr) => {
+      xhr.setRequestHeader('Content-Type', 'application/json')
+      xhr.send(JSON.stringify({ username: usernameInput, password: passwordInput }))
+    })
+  }
+
   function setContentView(view) {
     bodyContent.innerHTML = view.innerHTML;
   }
@@ -30,7 +54,7 @@ window.onload = () => {
     $(`#myTab a[href="${whichPillId}"]`).tab('show')
   }
  
-  setContentView(homeView);
+  // setContentView(homeView);
 
   prepairLinkForSwitchingView(homeViewLink, homeView, () => {
     console.log('switched to home view');
@@ -49,7 +73,7 @@ window.onload = () => {
       doAjax(upsertUrl, (result) => { 
         performTask(); 
         simulatePageRefresh(viewLink, `#${navpill}`) 
-      }, 'POST');
+      }, 'POST', (xhr) => { xhr.send() });
     }
   }
 
@@ -76,7 +100,7 @@ window.onload = () => {
         performTask();
         // alert(`PACKAGE ADDED SUCCESSFULLY!`) 
         simulatePageRefresh(viewLink, `#${navpill}`) 
-      }, 'POST');
+      }, 'POST', (xhr) => { xhr.send() });
     }
   }
 
@@ -97,7 +121,7 @@ window.onload = () => {
       }
 
       if (ondone) { ondone() }
-    }, 'GET')
+    }, 'GET', (xhr) => { xhr.send() })
   }
 
   // for adding area input field
@@ -147,7 +171,7 @@ window.onload = () => {
       for (const customer of customers) {
         customerInput.innerHTML += `<option value="${customer._id}">${customer.name}</option>`; 
       }
-    }, 'GET')
+    }, 'GET', (xhr) => { xhr.send() })
 
     customerInput.oninput = () => {
       doAjax(`/getPackagesOfCustomer/${encodeURIComponent(customerInput.value)}`, (packages) => {
@@ -160,7 +184,7 @@ window.onload = () => {
             <div><i class="fa fa-archive" aria-hidden="true"></i> package id: ${package._id}</div>
           `
         } 
-      }, 'GET');
+      }, 'GET', (xhr) => { xhr.send() });
     }
 
     fillAreasDropdown(); 
@@ -293,8 +317,6 @@ window.onload = () => {
         </div>
       `;
 
-      // if (performAnother) { performAnother() }
-
       $('#universalModal').modal('show')
     }
     
@@ -309,7 +331,7 @@ window.onload = () => {
               console.log(buttons[i].value)
               doAjax(`/${route}/${encodeURIComponent(buttons[i].value)}`, (result) => {
                 doWhat(result)
-              }, method)
+              }, method, (xhr) => { xhr.send() })
             }
             console.log(`${routes} operations successful!`);
             simulatePageRefresh(databaseViewLink, whichNavpill)
@@ -510,14 +532,14 @@ window.onload = () => {
       const allCustomersContainer = document.getElementById('allCustomersContainer');
 
       readyCustomerOperations(customers, allCustomersContainer, 'allCustomers')
-    }, 'GET')
+    }, 'GET', (xhr) => { xhr.send() })
 
     // all packages
     doAjax(`/getAllPackages`, (packages) => {
       const packagesContainer = document.getElementById('allPackagesContainer');
 
       readyPackageOperations(packages, allPackagesContainer, 'allPackages')
-    }, 'GET')
+    }, 'GET', (xhr) => { xhr.send() })
 
     // find customer
     const findCustomerInput = document.getElementById('findCustomerInput');
@@ -527,7 +549,7 @@ window.onload = () => {
         const findCustomerContainer = document.getElementById('findCustomerContainer'); 
 
         readyCustomerOperations(customers, findCustomerContainer, 'findCustomer')
-      }, 'GET')
+      }, 'GET', (xhr) => { xhr.send() })
     }
 
     // for finding packages
@@ -538,7 +560,7 @@ window.onload = () => {
         const packagesFoundContainer = document.getElementById('findPackageContainer'); 
 
         readyPackageOperations(packagesFound, findPackageContainer, 'findPackage')
-      }, 'GET')
+      }, 'GET', (xhr) => { xhr.send() })
     }
   })
 }

@@ -3,6 +3,7 @@ const { MongoClient } = require('mongodb');
 const path = require('path');
 const bodyParser = require('body-parser');
 const ObjectId = require('mongodb').ObjectID; 
+const jwt = require('jsonwebtoken');
 
 const app = express(); 
 const port = 8084; 
@@ -18,7 +19,38 @@ MongoClient.connect(url, (error, db) => {
   if (error) { console.log('db cannot be created!', error) }
   else { 
     console.log('db created!');
-    
+    // collections: 
+    // admins
+    // customers
+    // packages
+    // coveredAreas
+
+    // const loginUrl = `/login/:username/:password`
+    app.post('/login', (request, response) => {
+      const user = request.body.username; 
+      const pass = request.body.password; 
+
+      db.collection('admins').findOne({
+        username: user, 
+        password: pass
+      }, (error, result) => {
+        if (error) { 
+          console.log('could not find admin') 
+        }
+        else {
+          if (result !== null) {
+            console.log(result)
+            jwt.sign({ user }, 'iamasecret', (error, token) => {
+              response.json({ jwtToken: token, isFailure: false })
+            })
+          }
+          else {
+            response.json({ isFailure: true })
+          }
+        }
+      })
+    })
+
     const customerUrl = `/:name/:email/:password/:mobileNumber/:address`
     
     app.post(`/createCustomer${customerUrl}`, (request, response) => {
@@ -306,6 +338,10 @@ MongoClient.connect(url, (error, db) => {
     app.listen(port, () => { console.log(`Server @ http://localhost:${port}`) }); 
   }
 })
+
+function extractJwt(authHeader) {
+  return authHeader.slice(7)
+}
 
 function computePrice(distanceInKm, boxSize) {
   const ratePerKm = 5;
