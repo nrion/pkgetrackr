@@ -43,7 +43,6 @@ function handleCustomerTasks(app, db) {
 
   app.get('/getCustomers', (request, response) => {
     authenticate(request, response, (decoded) => {
-      console.log('decoded ', decoded)
       db.collection('customers').find().toArray((readErr, customers) => {
         if (readErr) { 
           console.log('/getCustomers err ', readErr) 
