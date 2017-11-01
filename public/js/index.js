@@ -25,13 +25,14 @@ window.onload = () => {
   }
 
   setContentView(adminLoginView);
+  hideNavbar(); 
   
   const signinBtn = document.getElementById('signinBtn');
   signinBtn.onclick = (event) => {
     event.preventDefault(); 
     login();
   }
-
+  
   homeViewLink.onclick = (event) => {
     event.preventDefault();
     setContentView(homeView);
@@ -94,18 +95,23 @@ window.onload = () => {
       username: document.getElementById('usernameInput').value,
       password: document.getElementById('passwordInput').value,
     }
-  
+
     doAjax('/login', 'POST', loginData, (result) => {
       if (!result.isFailure) {
         localStorage.setItem('theJwt', result.jwtToken)
         setContentView(homeView)
-        // showNavbar();
+        showNavbar();
       }
       else {
         alert('admin not found')
       }
     })
   }
+}
+
+function logout() {
+  localStorage.removeItem('theJwt');
+  location.reload(); 
 }
 
 function simulatePageRefresh(viewLink, whichPillId) {

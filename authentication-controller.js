@@ -12,10 +12,9 @@ function authenticate(request, response, dohere) {
     console.log('ERROR: ', error)
     if (error) {
       response.statusCode = 403; 
-      response.json({ whotfareu: 'i dont know u' })
+      response.json({ accessGranted: false })
     }
     else {
-      console.log(decoded.userSent)
       dohere(decoded)
     }
   })

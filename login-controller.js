@@ -15,11 +15,9 @@ function handleLogin(app, db) {
         throw error
       }
       else {
-        console.log(result)
         if (result !== null) {
-          console.log(result)
           jwt.sign({ user }, secret, (error, token) => {
-            response.json({ jwtToken: token, userSent: user, isFailure: false })
+            response.json({ jwtToken: token, isFailure: false })
           })
         }
         else { response.json({ isFailure: true }) }

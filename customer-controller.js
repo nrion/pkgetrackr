@@ -42,7 +42,6 @@ function handleCustomerTasks(app, db) {
   })
 
   app.get('/getCustomers', (request, response) => {
-    console.log(request.headers)
     authenticate(request, response, (decoded) => {
       console.log('decoded ', decoded)
       db.collection('customers').find().toArray((readErr, customers) => {
