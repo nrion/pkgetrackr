@@ -106,7 +106,6 @@ function insertPackageTrigger() {
   }
 }
 
-
 function displayAttribute(glyphicon, attributeName, attribute) {
   return `
     <div class="row">
@@ -187,6 +186,7 @@ function getPackageOwner(button) {
     'GET', null, (owner) => {
       setupModal('package owner', 
         getCustomerCardHtml(owner))
+        console.log(owner);
     })
 }
 

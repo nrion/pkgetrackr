@@ -41,6 +41,8 @@ window.onload = () => {
     event.preventDefault();
     setContentView(registrationView);
 
+    insertCustomerTrigger(); 
+
     const customerDropdown = document.getElementById('customerInput');
     // getAllCustomers(customerDropdown, getCustomerDropdownHtml(customer)); 
     getAllCustomers(customerDropdown, (customer) => {

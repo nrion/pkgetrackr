@@ -1,8 +1,37 @@
+function getCustomerInputs() {
+  const customer = {
+    name: document.getElementById('nameInput').value,
+    email: document.getElementById('emailInput').value,
+    password: document.getElementById('passwordInput').value,
+    mobileNumber: document.getElementById('mobileNumberInput').value,
+    address: document.getElementById('addressInput').value,
+  }
+
+  return customer; 
+}
+
+function insertCustomerTrigger() {
+  const registerCustomerBtn = 
+    document.getElementById('registerCustomerBtn'); 
+
+  registerCustomerBtn.onclick = () => {
+    const customer = getCustomerInputs();
+
+    doAjax(`/createCustomer`, 'POST', customer, () => {
+        alert('CUSTOMER ADDED SUCCESSFULLY!')
+
+        const registrationViewLink = document.getElementById('registrationViewLink')
+        simulatePageRefresh(registrationViewLink, '#customerRegistration'); 
+      })
+  }
+}
+
 function getCustomerDropdownHtml(customer) {
   return `<option value="${customer._id}">${customer.name}</option>`;
 }
 
 function getCustomerCardHtml(customer) {
+  console.log(customer)
   return `
     <div class="card border-dark mb-3" style="max-width: 40rem;">
       <div class="card-body text-dark">

@@ -178,9 +178,6 @@ MongoClient.connect(url, (error, db) => {
       )
     })
 
-    const packageUrl = '/:origin/:destination/:areasToPass' 
-      + '/:distanceInKm/:currentLocation/:status/:paymode/:boxSize/:declaredValue';
-    
     app.post(`/createPackage/:customerId`, (request, response) => {
       const computedPrice = computePrice(request.body.distanceInKm, request.body.boxSize);
 
@@ -244,9 +241,9 @@ MongoClient.connect(url, (error, db) => {
     })
 
     app.get('/getOwnerOfPackage/:packageId', (request, response) => {
-      db.collection('customers').find({
+      db.collection('customers').findOne({
         packages: ObjectId(request.params.packageId)
-      }).toArray((readErr, result) => {
+      }, (readErr, result) => {
         if (readErr) {
           console.log('/getOwnerOfPackage err ', readerr)
         }
