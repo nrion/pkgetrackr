@@ -30,36 +30,39 @@ MongoClient.connect(url, (error, db) => {
       const user = request.body.username; 
       const pass = request.body.password; 
 
+      console.log(user)
+      console.log(pass)
+
       db.collection('admins').findOne({
         username: user, 
         password: pass
       }, (error, result) => {
         if (error) { 
-          console.log('could not find admin') 
+          throw error
         }
         else {
+          console.log(result)
           if (result !== null) {
             console.log(result)
             jwt.sign({ user }, 'iamasecret', (error, token) => {
-              response.json({ jwtToken: token, isFailure: false })
+              response.json({ jwtToken: token, userSent: user, isFailure: false })
             })
           }
-          else {
-            response.json({ isFailure: true })
-          }
+          else { response.json({ isFailure: true }) }
         }
       })
     })
 
-    const customerUrl = `/:name/:email/:password/:mobileNumber/:address`
+    // const customerUrl = `/:name/:email/:password/:mobileNumber/:address`
     
-    app.post(`/createCustomer${customerUrl}`, (request, response) => {
+    // app.post(`/createCustomer${customerUrl}`, (request, response) => {
+    app.post(`/createCustomer`, (request, response) => {
       db.collection('customers').insertOne({
-        name: request.params.name, 
-        email: request.params.email, 
-        password: request.params.password, 
-        mobileNumber: request.params.mobileNumber, 
-        address: request.params.address,
+        name: request.body.name, 
+        email: request.body.email, 
+        password: request.body.password, 
+        mobileNumber: request.body.mobileNumber, 
+        address: request.body.address,
         packages: []
       }, (insertErr, result) => {
         if (insertErr) {
@@ -69,15 +72,15 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
-    app.post(`/updateCustomer/:customerId${customerUrl}`, (request, response) => {
+    app.post(`/updateCustomer/:customerId`, (request, response) => {
       db.collection('customers').update(
         { _id: ObjectId(request.params.customerId) },
         { $set: { 
-          name: request.params.name, 
-          email: request.params.email, 
-          password: request.params.password, 
-          mobileNumber: request.params.mobileNumber, 
-          address: request.params.address
+          name: request.body.name, 
+          email: request.body.email, 
+          password: request.body.password, 
+          mobileNumber: request.body.mobileNumber, 
+          address: request.body.address
          }
         }, (updateErr, result) => {
           if (updateErr) {
@@ -89,9 +92,9 @@ MongoClient.connect(url, (error, db) => {
     })
 
     app.get('/getCustomerById/:customerId', (request, response) => {
-      db.collection('customers').find({ 
+      db.collection('customers').findOne({ 
         _id: ObjectId(request.params.customerId) 
-      }).toArray((readErr, result) => {
+      }, (readErr, result) => {
         if (readErr) {
           console.log('/getCustmerById err ', readErr)
         }
@@ -100,9 +103,9 @@ MongoClient.connect(url, (error, db) => {
     })
 
     app.get('/getPackageById/:packageId', (request, response) => {
-      db.collection('packages').find({ 
+      db.collection('packages').findOne({ 
         _id: ObjectId(request.params.packageId) 
-      }).toArray((readErr, result) => {
+      }, (readErr, result) => {
         if (readErr) {
           console.log('/getPackageById err ', readErr)
         }
@@ -111,11 +114,15 @@ MongoClient.connect(url, (error, db) => {
     })
 
     app.get('/getCustomers', (request, response) => {
-      db.collection('customers').find().toArray((readErr, customers) => {
-        if (readErr) { 
-          console.log('/getCustomers err ', readErr) 
-        }
-        response.json(customers)
+      console.log(request.headers)
+      authenticate(request, response, (decoded) => {
+        console.log('decoded ', decoded)
+        db.collection('customers').find().toArray((readErr, customers) => {
+          if (readErr) { 
+            console.log('/getCustomers err ', readErr) 
+          }
+          response.json(customers)
+        })
       })
     })
 
@@ -132,9 +139,9 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
-    app.post('/removeCustomer/:customerId', (request, response) => {
+    app.post('/removeCustomer', (request, response) => {
       db.collection('customers').deleteOne({ 
-        _id: ObjectId(request.params.customerId) 
+        _id: ObjectId(request.body.customerId) 
       }, (deleteError, result) => {
         if (deleteError) { 
           console.log('/removeCustomer err ', deleteError) 
@@ -143,9 +150,9 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
-    app.post('/bulkRemovePackages/:customerId', (request, response) => {
+    app.post('/bulkRemovePackages', (request, response) => {
       db.collection('customers').findOne(
-        { _id: ObjectId(request.params.customerId) }, 
+        { _id: ObjectId(request.body.customerId) }, 
         { packages: 1 }, (findErr, result) => {
           if (findErr) {
             console.log('/bulkRemovePackages findErr ', findErr)
@@ -174,21 +181,19 @@ MongoClient.connect(url, (error, db) => {
     const packageUrl = '/:origin/:destination/:areasToPass' 
       + '/:distanceInKm/:currentLocation/:status/:paymode/:boxSize/:declaredValue';
     
-    app.post(`/createPackage/:customerId${packageUrl}`, (request, response) => {
-      const routes = request.params.areasToPass; 
-      const areasToPassArray = routes.split(',');
-      const computedPrice = computePrice(request.params.distanceInKm, request.params.boxSize);
+    app.post(`/createPackage/:customerId`, (request, response) => {
+      const computedPrice = computePrice(request.body.distanceInKm, request.body.boxSize);
 
       db.collection('packages').insertOne({ 
-        origin: request.params.origin, 
-        destination: request.params.destination, 
-        areasToPass: areasToPassArray, 
-        distanceInKm: request.params.distanceInKm,
-        currentLocation: request.params.currentLocation, 
-        status: request.params.status,
-        paymode: request.params.paymode,
-        boxSize: request.params.boxSize, 
-        declaredValue: request.params.declaredValue,
+        origin: request.body.origin, 
+        destination: request.body.destination, 
+        areasToPass: request.body.areasToPass, 
+        distanceInKm: request.body.distanceInKm,
+        currentLocation: request.body.currentLocation, 
+        status: request.body.status,
+        paymode: request.body.paymode,
+        boxSize: request.body.boxSize, 
+        declaredValue: request.body.declaredValue,
         price: computedPrice,
         transactionDate: new Date()
       }, (insertErr, result) => {
@@ -212,23 +217,21 @@ MongoClient.connect(url, (error, db) => {
       })
     });
 
-    app.post(`/updatePackage/:packageId${packageUrl}`, (request, response) => {
-      const routes = request.params.areasToPass; 
-      const areasToPassArray = routes.split(',');
-      const computedPrice = computePrice(request.params.distanceInKm, request.params.boxSize);
+    app.post(`/updatePackage/:packageId`, (request, response) => {
+      const computedPrice = computePrice(request.body.distanceInKm, request.body.boxSize);
       
       db.collection('packages').update(
         { _id: ObjectId(request.params.packageId) },
         { $set: { 
-          origin: request.params.origin, 
-          destination: request.params.destination, 
-          areasToPass: areasToPassArray, 
-          distanceInKm: request.params.distanceInKm,
-          currentLocation: request.params.currentLocation, 
-          status: request.params.status,
-          paymode: request.params.paymode,
-          boxSize: request.params.boxSize, 
-          declaredValue: request.params.declaredValue,
+          origin: request.body.origin, 
+          destination: request.body.destination, 
+          areasToPass: request.body.areasToPass, 
+          distanceInKm: request.body.distanceInKm,
+          currentLocation: request.body.currentLocation, 
+          status: request.body.status,
+          paymode: request.body.paymode,
+          boxSize: request.body.boxSize, 
+          declaredValue: request.body.declaredValue,
           price: computedPrice
          }
         }, (updateErr, result) => {
@@ -272,7 +275,6 @@ MongoClient.connect(url, (error, db) => {
               })
             }
             else {
-              console.log(result)
               response.json(result); 
             }
           }
@@ -290,9 +292,9 @@ MongoClient.connect(url, (error, db) => {
     })
 
     app.get('/findPackage/:packageId', (request, response) => {
-      db.collection('packages').find({ 
+      db.collection('packages').findOne({ 
         _id: ObjectId(request.params.packageId) 
-      }).toArray((readErr, packages) => {
+      }, (readErr, packages) => {
         if (readErr) { 
           console.log('/findPackage err ', readErr) 
         }
@@ -300,8 +302,8 @@ MongoClient.connect(url, (error, db) => {
       })
     })
 
-    app.post('/removePackageReference/:packageId', (request, response) => {
-      const packageId = ObjectId(request.params.packageId);
+    app.post('/removePackageReference', (request, response) => {
+      const packageId = ObjectId(request.body.packageId);
 
       db.collection('customers').update(
         { packages: packageId }, 
@@ -315,9 +317,9 @@ MongoClient.connect(url, (error, db) => {
       )
     })
 
-    app.post('/removePackage/:packageId', (request, response) => {
+    app.post('/removePackage', (request, response) => {
       db.collection('packages').deleteOne({ 
-        _id: ObjectId(request.params.packageId) 
+        _id: ObjectId(request.body.packageId) 
       }, (deleteError, result) => {
         if (deleteError) { 
           console.log('/removePackage err ', deleteError) 
@@ -363,4 +365,26 @@ function computePrice(distanceInKm, boxSize) {
   }
 
   return (distanceInKm * 5) + boxPrice; 
+}
+
+// function isCustomerValid(customer) {
+//   const { name, email, password, address, mobileNumber } = customer;
+
+//   if (typeof name === string && name.len)
+// }
+
+function authenticate(request, response, dohere) {
+  const authHeader = request.header('Authorization'); 
+  
+  jwt.verify(extractJwt(authHeader), 'iamasecret', (error, decoded) => {
+    console.log('ERROR: ', error)
+    if (error) {
+      response.statusCode = 403; 
+      response.json({ whotfareu: 'i dont know u' })
+    }
+    else {
+      console.log(decoded.userSent)
+      dohere(decoded)
+    }
+  })
 }

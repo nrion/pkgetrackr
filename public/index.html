@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
       crossorigin="anonymous">
     <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="custom.css">     
+    <link rel="stylesheet" href="css/custom.css">     
   </head>
   <body>
     <!-- nav bar -->
@@ -105,29 +105,30 @@
               <div class="customerForm">
                 <h5><i class="fa fa-user-circle-o" aria-hidden="true"></i> register a customer</h5>
                 <hr>
-                <!-- <form id="registrationForm" action="/createCustomer" method="POST"> -->
-                <div class="form-group">
-                  <label for="nameInput">name</label>
-                  <input required type="text" class="form-control" id="nameInput" name="name" placeholder="full name">
-                </div>
-                <div class="form-group">
-                  <label for="emailInput">email</label>
-                  <input required type="email" class="form-control" id="emailInput" name="email" placeholder="email">
-                </div>
-                <div class="form-group">
-                  <label for="passwordInput">password</label>
-                  <input type="password" class="form-control" id="passwordInput" name="password" placeholder="choose a password">
-                </div>
-                <div class="form-group">
-                  <label for="mobileNumberInput">mobile number</label>
-                  <input required type="number" class="form-control" id="mobileNumberInput" name="mobileNumber" placeholder="mobile number">
-                </div>
-                <div class="form-group">
-                  <label for="addressInput">address</label>
-                  <textarea required rows="2" class="form-control" id="addressInput" name="address" placeholder="address"></textarea>
-                </div>
-                <button id="registerCustomerBtn" class="btn btn-outline-dark">register</button>
-                <!-- </form> -->
+                <form id="registrationForm" action="/createCustomer" method="POST"> 
+                  <div class="form-group">
+                    <label for="nameInput">name</label>
+                    <input required type="text" class="form-control" id="nameInput" name="name" placeholder="full name">
+                  </div>
+                  <div class="form-group">
+                    <label for="emailInput">email</label>
+                    <input required type="email" class="form-control" id="emailInput" name="email" placeholder="email">
+                  </div>
+                  <div class="form-group">
+                    <label for="passwordInput">password</label>
+                    <input type="password" class="form-control" id="passwordInput" name="password" placeholder="choose a password">
+                  </div>
+                  <div class="form-group">
+                    <label for="mobileNumberInput">mobile number</label>
+                    <input required type="number" class="form-control" id="mobileNumberInput" name="mobileNumber" placeholder="mobile number">
+                  </div>
+                  <div class="form-group">
+                    <label for="addressInput">address</label>
+                    <textarea required rows="2" class="form-control" id="addressInput" name="address" placeholder="address"></textarea>
+                  </div>
+                  <!-- <button id="registerCustomerBtn" class="btn btn-outline-dark">register</button> -->
+                  <button type="submit" class="btn btn-outline-dark">register</button>
+                </form> 
               </div>
             </main> 
           </div>
@@ -202,7 +203,7 @@
                       <option value="large">large</option>
                     </select>
                   </div>
-                  <button id="addPackageButton" type="submit" class="btn btn-outline-dark">add</button>
+                   <button id="addPackageButton" type="submit" class="btn btn-outline-dark">add</button> 
                 </div>
                 <div class="col-md-5 packageForm">
                   <h5>packages</h5>
@@ -360,7 +361,10 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script> 
     <script src="bootstrap/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>   
-    <script src="main.js"></script>
-    <script src="ajax.js"></script>
+    <!-- <script src="js/main.js"></script> -->
+    <script src="js/ajax.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/customers.js"></script>
+    <script src="js/packages.js"></script>
   </body>
 </html>
