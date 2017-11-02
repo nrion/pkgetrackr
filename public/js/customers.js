@@ -81,7 +81,7 @@ function getEditCustomerModalHtml(customer) {
     <div class="form-group">
       <label for="passwordInput">password</label>
       <input type="password" class="form-control" id="passwordInput" 
-        value="${customer.password}" name="password" placeholder="choose a password">
+        name="password" placeholder="you can't edit your password. please choose a new one">
     </div>
     <div class="form-group">
       <label for="mobileNumberInput">mobile number</label>

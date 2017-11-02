@@ -24,8 +24,13 @@ window.onload = () => {
     bodyContent.innerHTML = view.innerHTML;
   }
 
-  setContentView(adminLoginView);
-  hideNavbar(); 
+  if (localStorage.getItem('theJwt')) {
+    setContentView(homeView);
+  }
+  else {
+    setContentView(adminLoginView);
+    hideNavbar(); 
+  }
   
   const signinBtn = document.getElementById('signinBtn');
   signinBtn.onclick = (event) => {
@@ -103,7 +108,7 @@ window.onload = () => {
         showNavbar();
       }
       else {
-        alert('admin not found')
+        alert(result.message);
       }
     })
   }

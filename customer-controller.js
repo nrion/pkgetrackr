@@ -1,33 +1,49 @@
 const ObjectId = require('mongodb').ObjectID; 
+const bcrypt = require('bcrypt');
 const authenticate = require('./authentication-controller')
 
 function handleCustomerTasks(app, db) {
   app.post(`/createCustomer`, (request, response) => {
-    db.collection('customers').insertOne({
-      name: request.body.name, 
-      email: request.body.email, 
-      password: request.body.password, 
-      mobileNumber: request.body.mobileNumber,
-      address: request.body.address,
-      packages: []
-    }, (insertErr, result) => {
-      if (insertErr) {
-        console.log('/createCustomer err ', insertErr);
-      }
-      response.json(result)
+    const { name, email, password, mobileNumber, address } = request.body; 
+
+    encryptPassword(password, (hashedPass) => {
+      db.collection('customers').insertOne({
+        name: name, 
+        email: email, 
+        password: hashedPass, 
+        mobileNumber: mobileNumber,
+        address: address,
+        packages: []
+      }, (insertErr, result) => {
+        if (insertErr) {
+          console.log('/createCustomer err ', insertErr);
+        }
+        response.json(result)
+      })
     })
   })
 
   app.post(`/updateCustomer/:customerId`, (request, response) => {
-    db.collection('customers').update(
-      { _id: ObjectId(request.params.customerId) },
-      { $set: request.body }, (updateErr, result) => {
-        if (updateErr) {
-          console.log('/updateCustomer err ', updateErr)
+    const { name, email, password, mobileNumber, address } = request.body; 
+    
+    encryptPassword(request.body.password, (hashedPass) => {
+      db.collection('customers').update(
+        { _id: ObjectId(request.params.customerId) },
+        { $set: {
+            name: name, 
+            email: email, 
+            password: hashedPass, 
+            mobileNumber: mobileNumber, 
+            address: address
+          } 
+        }, (updateErr, result) => {
+          if (updateErr) {
+            console.log('/updateCustomer err ', updateErr)
+          }
+          response.json(result)
         }
-        response.json(result)
-      }
-    )
+      )
+    })
   })
 
   app.get('/getCustomerById/:customerId', (request, response) => {
@@ -105,10 +121,48 @@ function handleCustomerTasks(app, db) {
   })
 }
 
-// function isCustomerValid(customer) {
-//   const { name, email, password, address, mobileNumber } = customer;
+function encryptPassword(password, insert) {
+  bcrypt.genSalt(12, (saltErr, salt) => {
+    if (saltErr) { 
+      console.log('err generating salt ', saltErr);
+    }
+    else {
+      bcrypt.hash(password, salt, (hashErr, hashedPass) => {
+        if (hashErr) {
+          console.log('err hashing pw ', hashErr);
+        }
+        else {
+          insert(hashedPass); 
+        }
+      })
+    }
+  })
+}
 
-//   if (typeof name === string && name.len)
+// function isCustomerValid(customer) {
+//   const numberOfAttribs = Object.keys(customer).length; 
+
+//   if (typeof customer !== 'object' || numberOfAttribs !== 5) {
+//     return false; 
+//   }
+//   else {
+//     const { name, email, password, mobileNumber, address } = customer; 
+//     let isValid = {
+//       name: false, 
+//       email: false, 
+//       password: false, 
+//       mobileNumber: false, 
+//       address: false, 
+//     }
+
+//     const nameRegex = /A-Za-z/;
+    
+//     if (typeof name === 'string' && ) {
+      
+//     }
+
+//     if 
+//   }
 // }
 
 module.exports = handleCustomerTasks; 
