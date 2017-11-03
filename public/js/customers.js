@@ -17,12 +17,17 @@ function insertCustomerTrigger() {
   registerCustomerBtn.onclick = () => {
     const customer = getCustomerInputs();
 
-    doAjax(`/createCustomer`, 'POST', customer, () => {
+    doAjax(`/createCustomer`, 'POST', customer, (result) => {
+      if (result.isSuccessful) {
         alert('CUSTOMER ADDED SUCCESSFULLY!')
 
         const registrationViewLink = document.getElementById('registrationViewLink')
         simulatePageRefresh(registrationViewLink, '#customerRegistration'); 
-      })
+      }
+      else {
+        alert(result.message);
+      }
+    })
   }
 }
 
@@ -111,25 +116,22 @@ function editCustomer(button) {
 
 function updateCustomer(button) {
   const customerId = encodeURIComponent(button.value);
-  
-  const customer = {
-    name: document.getElementById('nameInput').value,
-    email: document.getElementById('emailInput').value,
-    password: document.getElementById('passwordInput').value,
-    mobileNumber: document.getElementById('mobileNumberInput').value,
-    address: document.getElementById('addressInput').value,
-  }
+  const customer = getCustomerInputs(); 
 
   doAjax(`/updateCustomer/${customerId}`, 
     'POST', customer, (result) => {
-      $('#universalModal').modal('hide')
-      alert('customer updated!')
+      if (result.isSuccessful) {
+        $('#universalModal').modal('hide')
+        alert('customer updated!')
 
-      const dbViewLink = document.getElementById('databaseViewLink');
-      simulatePageRefresh(dbViewLink, '#allCustomers')
+        const dbViewLink = document.getElementById('databaseViewLink');
+        simulatePageRefresh(dbViewLink, '#allCustomers')
+      }
+      else {
+        alert(result.message);
+      }
     })
 }
-
 
 function deleteCustomer(button) {
   const id = { customerId: encodeURIComponent(button.value) }

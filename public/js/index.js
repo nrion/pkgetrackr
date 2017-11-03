@@ -12,6 +12,7 @@ window.onload = () => {
   const registrationView = document.getElementById('registrationView');
   const dbView = document.getElementById('databaseView');
 
+  // setting of views upon opening/refresh
   if (localStorage.getItem('theJwt')) {
     setContentView(homeView);
   }
@@ -20,6 +21,7 @@ window.onload = () => {
     hideNavbar(); 
   }
   
+  // trigger for sign in button
   const signinBtn = document.getElementById('signinBtn');
   if (signinBtn) {
     signinBtn.onclick = (event) => {
@@ -28,22 +30,26 @@ window.onload = () => {
     }
   }
   
+  // trigger for home view
   homeViewLink.onclick = (event) => {
     event.preventDefault();
     setContentView(homeView);
   }
 
+  // trigger for registration view
   registrationViewLink.onclick = (event) => {
     event.preventDefault();
     setContentView(registrationView);
 
     insertCustomerTrigger(); 
 
+    // filling of customer dropdown dropdowns
     const customerDropdown = document.getElementById('customerInput');
     getAllCustomers(customerDropdown, (customer) => {
       return getCustomerDropdownHtml(customer);
     }); 
 
+    // filling of packages container upon dropdown input
     customerDropdown.oninput = () => {
       const customerId = customerDropdown.value; 
       getRegistrationViewPkges(customerId); 
@@ -55,28 +61,33 @@ window.onload = () => {
     insertPackageTrigger(); 
   }
 
+  // trigger for db view
   dbViewLink.onclick = (event) => {
     event.preventDefault();
     setContentView(dbView);
 
-    // customer transactions
+    /* customer transactions */
+    // filling of customers to main body
     const allCustomersContainer = document.getElementById('allCustomersContainer');
     getAllCustomers(allCustomersContainer, (customer) => {
       return getCustomerCardHtml(customer)
     }); 
     
+    // finding customer
     const findCustomerInput = document.getElementById('findCustomerInput');
     findCustomerInput.onkeyup = () => {
       const customerName = findCustomerInput.value;
       findCustomer(customerName);
     }
 
-    // package transactions
+    /* package transactions */
+    // filling of packages to main body
     const allPackagesContainer = document.getElementById('allPackagesContainer');
     getAllPackages(allPackagesContainer, (package) => {
       return getPackageCardHtml(package)
     });
 
+    // finding package
     const findPackageInput = document.getElementById('findPackageInput');
     findPackageInput.onkeyup = () => {
       const packageid = findPackageInput.value; 

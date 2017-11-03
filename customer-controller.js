@@ -6,35 +6,45 @@ function handleCustomerTasks(app, db) {
   app.post(`/createCustomer`, (request, response) => {
     const customer = request.body; 
 
-    encryptPassword(customer.password, (hashedPass) => {
-      customer.password = hashedPass; 
-      customer.packages = [];
+    if (isCustomerValid(customer)) {
+      encryptPassword(customer.password, (hashedPass) => {
+        customer.password = hashedPass; 
+        customer.packages = [];
 
-      db.collection('customers').insertOne(customer, (insertErr, result) => {
-          if (insertErr) {
-            console.log('/createCustomer err ', insertErr);
-          }
-          response.json(result)
-        })
-    })
+        db.collection('customers').insertOne(customer, (insertErr, result) => {
+            if (insertErr) {
+              console.log('/createCustomer err ', insertErr);
+            }
+            response.json({ isSuccessful: true, result })
+          })
+      })
+    }
+    else {
+      response.json({ isSuccessful: false, message: 'invalid form' })
+    }
   })
 
   app.post(`/updateCustomer/:customerId`, (request, response) => {
     const customer = request.body; 
 
-    encryptPassword(customer.password, (hashedPass) => {
-      customer.password = hashedPass; 
-      
-      db.collection('customers').update(
-        { _id: ObjectId(request.params.customerId) },
-        { $set: customer }, (updateErr, result) => {
-          if (updateErr) {
-            console.log('/updateCustomer err ', updateErr)
+    if (isCustomerValid(customer)) {
+      encryptPassword(customer.password, (hashedPass) => {
+        customer.password = hashedPass; 
+        
+        db.collection('customers').update(
+          { _id: ObjectId(request.params.customerId) },
+          { $set: customer }, (updateErr, result) => {
+            if (updateErr) {
+              console.log('/updateCustomer err ', updateErr)
+            }
+            response.json({ isSuccessful: true, result })
           }
-          response.json(result)
-        }
-      )
-    })
+        )
+      })
+    }
+    else {
+      response.json({ isSuccessful: false, message: 'invalid form' })
+    }
   })
 
   app.get('/getCustomerById/:customerId', (request, response) => {
@@ -130,28 +140,41 @@ function encryptPassword(password, insert) {
   })
 }
 
-// function isCustomerValid(customer) {
-//   const numberOfAttribs = Object.keys(customer).length; 
+function isCustomerValid(customer) {
+  const numberOfAttribs = Object.keys(customer).length; 
 
-//   if (typeof customer !== 'object' || numberOfAttribs !== 5) {
-//     return false; 
-//   }
-//   else {
-//     const { name, email, password, mobileNumber, address } = customer; 
-//     let isValid = {
-//       name: false, 
-//       email: false, 
-//       password: false, 
-//       mobileNumber: false, 
-//       address: false, 
-//     }
+  if (typeof customer !== 'object' || numberOfAttribs !== 5) {
+    return false; 
+  }
+  else {
+    const { name, email, mobileNumber, address } = customer;
+    let isValid = {
+      name: false, 
+      email: false, 
+      mobileNumber: false, 
+      address: false, 
+    }
 
-//     if (typeof name === 'string' && ) {
-      
-//     }
+    const nameRegex = /^[A-Za-z]+[A-Za-z\s\,\.\-]+[A-Za-z\.]$/; 
+    const emailRegex = /^[\w-\.]+@[a-z]+\.[a-z]{2,3}$/;
+    const numberRegex = /^(\+?63|0)?9\d{9}$/;
+    const addressRegex = /^[a-zA-Z0-9]+[a-zA-Z0-9\s\.\,\-]+[a-zA-Z]$/;
 
-//     if 
-//   }
-// }
+    if (nameRegex.test(name)) {
+      isValid.name = true; 
+    }
+    if (emailRegex.test(email)) {
+      isValid.email = true; 
+    }
+    if (numberRegex.test(mobileNumber)) {
+      isValid.mobileNumber = true; 
+    } 
+    if (addressRegex.test(address)) {
+      isValid.address = true; 
+    }
+
+    return Object.values(isValid).every(item => item === true);
+  }
+}
 
 module.exports = handleCustomerTasks; 

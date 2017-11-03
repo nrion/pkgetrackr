@@ -27,16 +27,26 @@ function handleLogin(app, db) {
           verifyPassword(password, found.password, (verified) => {
             if (verified) {
               jwt.sign({ username }, secret, (error, token) => {
-                response.json({ jwtToken: token, message: 'user verified', isFailure: false })
+                response.json({ 
+                  jwtToken: token, 
+                  message: 'user verified', 
+                  isFailure: false 
+                })
               })
             }
             else {
-              response.json({ message: 'incorrect password', isFailure: true })
+              response.json({ 
+                message: 'incorrect password', 
+                isFailure: true 
+              })
             }
           })
         } 
         else {
-          response.json({ message: 'user not found', isFailure: true });
+          response.json({
+            message: 'user not found', 
+            isFailure: true 
+          });
         }
       }
     })
