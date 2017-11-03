@@ -9,9 +9,9 @@ const handleLogin = require('./login-controller');
 const handlePackageTasks = require('./package-controller');
 
 const app = express(); 
-const port = 8084; 
-// const url = `mongodb://localhost:27017/tracker`;
-const url = `mongodb://nrion:ronnaronna@ds245715.mlab.com:45715/pkgetrackr`;
+const port = process.env.PORT || 8084; 
+// const url = `mongodb://nrion:ronnaronna@ds245715.mlab.com:45715/pkgetrackr`;
+const url = process.env.MONGODB_URI || `mongodb://localhost:27017/tracker`;
 
 app
   .use(bodyParser.urlencoded({ extended: true }))
