@@ -7,11 +7,11 @@ const handleCoveredAreasTasks = require('./covered-areas-controller')
 const handleCustomerTasks = require('./customer-controller');
 const handleLogin = require('./login-controller');
 const handlePackageTasks = require('./package-controller');
-// const verify = require('./verification');
 
 const app = express(); 
 const port = 8084; 
 const url = `mongodb://localhost:27017/tracker`;
+// const url = `mongodb://nrion:ronnaronna@ds245715.mlab.com:45715/pkgetrackr`;
 
 app
   .use(bodyParser.urlencoded({ extended: true }))
@@ -25,11 +25,6 @@ MongoClient.connect(url, (error, db) => {
   }
   else { 
     console.log('db created!');
-    // collections: 
-    // admins
-    // customers
-    // packages
-    // coveredAreas
 
     handleCoveredAreasTasks(app, db);
     handleCustomerTasks(app, db);

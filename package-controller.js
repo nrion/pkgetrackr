@@ -42,21 +42,13 @@ function handlePackageTasks(app, db) {
   })
 
   app.post(`/createPackage/:customerId`, (request, response) => {
-    const computedPrice = computePrice(request.body.distanceInKm, request.body.boxSize);
+    const package = request.body; 
+    const { distanceInKm, boxSize } = package; 
+    
+    package.price = computePrice(distanceInKm, boxSize);
+    package.transactionDate = new Date();      
 
-    db.collection('packages').insertOne({ 
-      origin: request.body.origin, 
-      destination: request.body.destination, 
-      areasToPass: request.body.areasToPass, 
-      distanceInKm: request.body.distanceInKm,
-      currentLocation: request.body.currentLocation, 
-      status: request.body.status,
-      paymode: request.body.paymode,
-      boxSize: request.body.boxSize, 
-      declaredValue: request.body.declaredValue,
-      price: computedPrice,
-      transactionDate: new Date()
-    }, (insertErr, result) => {
+    db.collection('packages').insertOne(package, (insertErr, result) => {
       if (insertErr) { 
         console.log('/createPackage err ', insertErr) 
       }
@@ -78,23 +70,14 @@ function handlePackageTasks(app, db) {
   });
 
   app.post(`/updatePackage/:packageId`, (request, response) => {
-    const computedPrice = computePrice(request.body.distanceInKm, request.body.boxSize);
+    const package = request.body; 
+    const { distanceInKm, boxSize } = package; 
+
+    package.price = computePrice(distanceInKm, boxSize);
     
     db.collection('packages').update(
       { _id: ObjectId(request.params.packageId) },
-      { $set: { 
-        origin: request.body.origin, 
-        destination: request.body.destination, 
-        areasToPass: request.body.areasToPass, 
-        distanceInKm: request.body.distanceInKm,
-        currentLocation: request.body.currentLocation, 
-        status: request.body.status,
-        paymode: request.body.paymode,
-        boxSize: request.body.boxSize, 
-        declaredValue: request.body.declaredValue,
-        price: computedPrice
-        }
-      }, (updateErr, result) => {
+      { $set: package }, (updateErr, result) => {
         if (updateErr) {
           console.log('/updatePackage err ', updateErr)
         }

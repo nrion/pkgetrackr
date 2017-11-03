@@ -107,8 +107,6 @@ function editCustomer(button) {
       setupModal('edit customer', 
         getEditCustomerModalHtml(customer));
     })
-
-  // updateCustomer(customerId); 
 }
 
 function updateCustomer(button) {

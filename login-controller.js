@@ -23,12 +23,8 @@ function handleLogin(app, db) {
         throw error
       } 
       else {
-        console.log('found ', found)
         if (found !== null) {
-          console.log('input ', password)
-          console.log('found ', found.password)
           verifyPassword(password, found.password, (verified) => {
-            console.log('verifed? ', verified);
             if (verified) {
               jwt.sign({ username }, secret, (error, token) => {
                 response.json({ jwtToken: token, message: 'user verified', isFailure: false })

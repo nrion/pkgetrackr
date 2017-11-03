@@ -4,39 +4,30 @@ const authenticate = require('./authentication-controller')
 
 function handleCustomerTasks(app, db) {
   app.post(`/createCustomer`, (request, response) => {
-    const { name, email, password, mobileNumber, address } = request.body; 
+    const customer = request.body; 
 
-    encryptPassword(password, (hashedPass) => {
-      db.collection('customers').insertOne({
-        name: name, 
-        email: email, 
-        password: hashedPass, 
-        mobileNumber: mobileNumber,
-        address: address,
-        packages: []
-      }, (insertErr, result) => {
-        if (insertErr) {
-          console.log('/createCustomer err ', insertErr);
-        }
-        response.json(result)
-      })
+    encryptPassword(customer.password, (hashedPass) => {
+      customer.password = hashedPass; 
+      customer.packages = [];
+
+      db.collection('customers').insertOne(customer, (insertErr, result) => {
+          if (insertErr) {
+            console.log('/createCustomer err ', insertErr);
+          }
+          response.json(result)
+        })
     })
   })
 
   app.post(`/updateCustomer/:customerId`, (request, response) => {
-    const { name, email, password, mobileNumber, address } = request.body; 
-    
-    encryptPassword(request.body.password, (hashedPass) => {
+    const customer = request.body; 
+
+    encryptPassword(customer.password, (hashedPass) => {
+      customer.password = hashedPass; 
+      
       db.collection('customers').update(
         { _id: ObjectId(request.params.customerId) },
-        { $set: {
-            name: name, 
-            email: email, 
-            password: hashedPass, 
-            mobileNumber: mobileNumber, 
-            address: address
-          } 
-        }, (updateErr, result) => {
+        { $set: customer }, (updateErr, result) => {
           if (updateErr) {
             console.log('/updateCustomer err ', updateErr)
           }
@@ -155,8 +146,6 @@ function encryptPassword(password, insert) {
 //       address: false, 
 //     }
 
-//     const nameRegex = /A-Za-z/;
-    
 //     if (typeof name === 'string' && ) {
       
 //     }

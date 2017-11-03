@@ -12,18 +12,6 @@ window.onload = () => {
   const registrationView = document.getElementById('registrationView');
   const dbView = document.getElementById('databaseView');
 
-  function hideNavbar() {
-      document.getElementById('theNavbar').style.display = 'none';
-  }
-
-  function showNavbar() {
-      document.getElementById('theNavbar').style.display = 'block';
-  }
-
-  function setContentView(view) {
-    bodyContent.innerHTML = view.innerHTML;
-  }
-
   if (localStorage.getItem('theJwt')) {
     setContentView(homeView);
   }
@@ -33,9 +21,11 @@ window.onload = () => {
   }
   
   const signinBtn = document.getElementById('signinBtn');
-  signinBtn.onclick = (event) => {
-    event.preventDefault(); 
-    login();
+  if (signinBtn) {
+    signinBtn.onclick = (event) => {
+      event.preventDefault(); 
+      login();
+    }
   }
   
   homeViewLink.onclick = (event) => {
@@ -50,9 +40,8 @@ window.onload = () => {
     insertCustomerTrigger(); 
 
     const customerDropdown = document.getElementById('customerInput');
-    // getAllCustomers(customerDropdown, getCustomerDropdownHtml(customer)); 
     getAllCustomers(customerDropdown, (customer) => {
-      return getCustomerDropdownHtml(customer); // this one is weird
+      return getCustomerDropdownHtml(customer);
     }); 
 
     customerDropdown.oninput = () => {
@@ -93,6 +82,19 @@ window.onload = () => {
       const packageid = findPackageInput.value; 
       findPackage(packageid);
     }
+  }
+
+  // methods
+  function hideNavbar() {
+      document.getElementById('theNavbar').style.display = 'none';
+  }
+
+  function showNavbar() {
+      document.getElementById('theNavbar').style.display = 'block';
+  }
+
+  function setContentView(view) {
+    bodyContent.innerHTML = view.innerHTML;
   }
 
   function login() {
