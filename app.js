@@ -18,7 +18,6 @@ app
   .use(bodyParser.json())
   .use(express.static(path.join(__dirname, 'public')))
 
-
 MongoClient.connect(url, (error, db) => {
   if (error) { 
     console.log('db cannot be created!', error) 

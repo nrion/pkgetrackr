@@ -1,3 +1,4 @@
+// fills origin and destination dropdowns
 function fillAreasDropdown(taskForEdit) {
   const destinationInput = document.getElementById('destinationInput');
   const originInput = document.getElementById('originInput');
@@ -15,22 +16,33 @@ function fillAreasDropdown(taskForEdit) {
       destinationInput.innerHTML += optionTag; 
     }
 
+    // for prefill in editing a package
     if (taskForEdit) { taskForEdit() }
   })
 }
 
-
+// adds a route input field if add btn is clicked
 function addRouteTrigger() {
   document.getElementById('addAreaBtn').onclick = () => {
     $(`#routeInputsContainer`).append(`
       <div class="input-group mt-1 areaInputGroup">
-        <input type="text" class="form-control areaToPassInput" 
+        <input type="text" oninput="fillCurrentLocation()" class="form-control areaToPassInput" 
           name="areaToPass" placeholder="where should it pass?">
       </div>
     `);
   }
 }
 
+// fills current location with the first input from areas to pass
+function fillCurrentLocation() {
+  const areaToPassInputs = document.getElementsByClassName('areaToPassInput');
+  const firstInput = areaToPassInputs[0].value;
+
+  const currentLocationInput = document.getElementById('currentLocationInput');
+  currentLocationInput.value = firstInput; 
+}
+
+// removes a route input field if remove btn is clicked
 function removeRouteTrigger() {
   document.getElementById('removeAreaBtn').onclick = () => {
     const areas = document.getElementsByClassName('areaInputGroup'); 
@@ -44,6 +56,7 @@ function removeRouteTrigger() {
   }
 }
 
+// gets customer packages from db and display their ids
 function getRegistrationViewPkges(customerId) {
   doAjax(`/getPackagesOfCustomer/${customerId}`, 
     'GET', null, (packages) => {
@@ -51,6 +64,7 @@ function getRegistrationViewPkges(customerId) {
     }); 
 }
 
+// fills the container with package ids
 function fillCustomerPackageIds(packages) {
   const addedPkgesContainer = document.getElementById('addedPackagesContainer');
   addedPkgesContainer.innerHTML = '';
@@ -63,6 +77,7 @@ function fillCustomerPackageIds(packages) {
   } 
 } 
 
+// retrieves package inputs from the fields
 function getPackageInputs() {
   const areaInputs = document.getElementsByClassName('areaToPassInput'); 
   const areasToPassArray = [];
@@ -86,13 +101,11 @@ function getPackageInputs() {
   return package; 
 }
 
+// inserts package if the add btn is clicked
 function insertPackageTrigger() {
   const addPkgeBtn = document.getElementById('addPackageButton'); 
 
-  console.log('i reached insert pacakge')
-
   addPkgeBtn.onclick = () => {
-    console.log('i reached on click')
     const customerId = document.getElementById('customerInput').value; 
     const package = getPackageInputs();
 
@@ -106,14 +119,18 @@ function insertPackageTrigger() {
   }
 }
 
+// html for package attributes in the package card
 function displayAttribute(glyphicon, attributeName, attribute) {
   return `
     <div class="row">
-      <div class="col-6"><i class="fa fa-${glyphicon}" aria-hidden="true"></i> ${attributeName}</div>
+      <div class="col-6"><i class="fa fa-${glyphicon}" aria-hidden="true"></i> 
+        ${attributeName}</div>
       <div class="col-auto"><b>${attribute}</b></div>
     </div>`; 
 }
 
+
+// html for a single package card
 function getPackageCardHtml(package) {
   let areaList = '';
 
@@ -168,6 +185,7 @@ function getPackageCardHtml(package) {
   `;  
 }
 
+// displays the chosen package html to the chosen container
 function getAllPackages(whichContainer, whichHtml) {
   doAjax('/getAllPackages', 
     'GET', null, (packages) => {
@@ -179,6 +197,7 @@ function getAllPackages(whichContainer, whichHtml) {
     })
 }
 
+// displays the package owner modal
 function getPackageOwner(button) {
   const packageId = encodeURIComponent(button.value);
 
@@ -186,10 +205,10 @@ function getPackageOwner(button) {
     'GET', null, (owner) => {
       setupModal('package owner', 
         getCustomerCardHtml(owner))
-        console.log(owner);
     })
 }
 
+// html for edit package modal
 function getEditPackageModalHtml(package) {
   return `
     <div class="form-group">
@@ -222,9 +241,12 @@ function getEditPackageModalHtml(package) {
     </div>
     <div class="form-group">
       <label for="currentLocationInput">current location</label>
-      <input value="${package.currentLocation}" type="text" class="form-control" 
+      <select id="currentLocationInput" class="form-control" name="currentLocation">
+        
+      </select>
+      <!-- <input value="${package.currentLocation}" type="text" class="form-control" 
         id="currentLocationInput" name="currentLocation" 
-        placeholder="where is it right now?">
+        placeholder="where is it right now?"> -->
     </div>
     <div class="form-group">
       <label for="declaredValueInput">declared value</label>
@@ -302,17 +324,25 @@ function completeFillPackageFields(package) {
   document.getElementById('statusInput').value = package.status;
   document.getElementById('paymodeInput').value = package.paymode;
   document.getElementById('boxSizeInput').value = package.boxSize;
+
+  // enumerate all areas to pass for current location
+  const currentLocationInput = document.getElementById('currentLocationInput'); 
+  for (const area of package.areasToPass) {
+    currentLocationInput.innerHTML += `
+      <option value="${area}">${area}</option>
+    `;
+  }
+
+  // prefill current location
+  currentLocationInput.value = package.currentLocation; 
 }
 
 function updatePackage(button) {
   const packageId = encodeURIComponent(button.value);
   const package = getPackageInputs(); 
 
-  console.log(packageId);
-
   doAjax(`/updatePackage/${packageId}`, 
     'POST', package, (result) => {
-      console.log(result)
       alert('PACKAGE UPDATED SUCCESSFULLY!')
       $('#universalModal').modal('hide');
       const dbViewLink = document.getElementById('databaseViewLink')
@@ -326,7 +356,6 @@ function deletePackage(button) {
   
   for (const url of urlArray) {
     doAjax(`/${url}`, 'POST', id, (result) => {
-        console.log(result); 
         console.log('successfully deleted!')
       })
   }
@@ -352,7 +381,8 @@ function getCustomerPackages(button) {
     'GET', null, (packages) => {
       if (packages.length == undefined || packages.length == 0) {
         alert(`This guy ain't got no package!`)
-      } else {
+      } 
+      else {
         setupModal('packages', getPackagesModalHtml(packages));
       }
     }) 

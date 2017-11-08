@@ -1,3 +1,4 @@
+// gets customer inputs from input fields
 function getCustomerInputs() {
   const customer = {
     name: document.getElementById('nameInput').value,
@@ -10,9 +11,9 @@ function getCustomerInputs() {
   return customer; 
 }
 
+// inserts customer if the register btn is clicked
 function insertCustomerTrigger() {
-  const registerCustomerBtn = 
-    document.getElementById('registerCustomerBtn'); 
+  const registerCustomerBtn = document.getElementById('registerCustomerBtn'); 
 
   registerCustomerBtn.onclick = () => {
     const customer = getCustomerInputs();
@@ -31,10 +32,12 @@ function insertCustomerTrigger() {
   }
 }
 
+// html for the customer dropdown
 function getCustomerDropdownHtml(customer) {
   return `<option value="${customer._id}">${customer.name}</option>`;
 }
 
+// html for a single customer card
 function getCustomerCardHtml(customer) {
   console.log(customer)
   return `
@@ -61,16 +64,19 @@ function getCustomerCardHtml(customer) {
   `;
 }
 
+// displays the chosen html to the chosen container
 function getAllCustomers(whichContainer, whichHtml) {
   doAjax('/getCustomers', 'GET', null, (customers) => {
     whichContainer.innerHTML = '';
 
+    console.log(typeof customers)
     for (const customer of customers) {
       whichContainer.innerHTML += whichHtml(customer);
     }
   })
 }
 
+// html for the edit customer modal
 function getEditCustomerModalHtml(customer) {
   return `
     <div class="form-group">
@@ -104,6 +110,7 @@ function getEditCustomerModalHtml(customer) {
   `
 }
 
+// displays prefilled customer form modal for editing
 function editCustomer(button) {
   const customerId = encodeURIComponent(button.value); 
 
@@ -114,6 +121,8 @@ function editCustomer(button) {
     })
 }
 
+
+// updates the customer if the update btn is clicked
 function updateCustomer(button) {
   const customerId = encodeURIComponent(button.value);
   const customer = getCustomerInputs(); 
@@ -133,14 +142,14 @@ function updateCustomer(button) {
     })
 }
 
+// deletes the customer if the del btn is clicked
 function deleteCustomer(button) {
   const id = { customerId: encodeURIComponent(button.value) }
   const urlArray = [ 'bulkRemovePackages', 'removeCustomer' ]; 
 
-  for (const url of urlArray) {
+  for (const url of urlArray) { 
     doAjax(`/${url}`, 
       'POST', id, (result) => {
-        console.log(result); 
         console.log('successfully deleted!')
       })
   }
@@ -149,6 +158,7 @@ function deleteCustomer(button) {
   simulatePageRefresh(dbViewLink, '#allCustomers')
 }
 
+// displays the customers found
 function findCustomer(customerName) {
   const findCustomerContainer = 
     document.getElementById('findCustomerContainer');
